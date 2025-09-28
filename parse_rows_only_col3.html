@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title> Users Transfer  </title>
+<style>
+body {
+    font-family: system-ui,Segoe UI,Roboto,"Noto Sans",Arial;
+    direction: rtl;
+    padding: 20px;
+    background: #121212;
+    color: #e0e0e0;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+textarea {
+    width: 100%;
+    height: 160px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 13px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #1e1e1e;
+    color: #e0e0e0;
+}
+button {
+    padding: 10px 18px;
+    margin: 4px 2px;
+    cursor: pointer;
+    transition: 0.3s;
+    background: linear-gradient(45deg,#4e9af1,#1e90ff);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+}
+button:hover {
+    background: linear-gradient(45deg,#1e90ff,#4e9af1);
+}
+#tblWrap {
+    margin-top: 16px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1e1e1e;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    color: #e0e0e0;
+}
+th, td {
+    border: 1px solid #333;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+th {
+    background: #333333;
+}
+input[type="text"] {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid #555;
+    background: #2c2c2c;
+    color: #e0e0e0;
+}
+.buttons-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+p {
+    color: #ff6b6b;
+}
+</style>
+</head>
+<body>
+
+<h2>   joget process 85  </h2>
+
+<textarea id="raw" placeholder="ألصق هنا البيانات الثلاثة أعمدة"></textarea>
+
+<div class="buttons-wrapper">
+    <button id="togglePreview">حول الجدول</button>
+    <button id="exportExcel">تحميل Excel</button>
+    <button id="changeCreatedBy">تغيير Created by</button>
+</div>
+
+<div id="tblWrap" style="display:none;"></div>
+
+<!-- مكتبة SheetJS -->
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+<script>
+let previewVisible = false;
+let createdByValue = '';
+
+function cleanZeros(token){
+    return token ? token.replace(/([A-Za-z\u0621-\u064A]+)0+(\d+)/g, '$1$2') : token;
+}
+
+function parseLines(text, createdBy){
+    return text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(line=>{
+        var parts = line.split(/\t|\s+/);
+        if(parts.length < 3) return null;
+        var contract = parts[0];
+        var zone = parts[2];
+        var fdt = cleanZeros(parts[2]);
+        return [contract, zone, fdt, createdBy];
+    }).filter(Boolean);
+}
+
+function buildTable(rows){
+    if(rows.length === 0){
+        document.getElementById('tblWrap').innerHTML = '<p>لا توجد بيانات.</p>';
+        return;
+    }
+    let html = '<table id="mainTable"><thead><tr>'+
+               '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th>'+
+               '</tr></thead><tbody>';
+    rows.forEach(r=>{
+        html += `<tr>
+                    <td>${r[0]}</td>
+                    <td>${r[1]}</td>
+                    <td>${r[2]}</td>
+                    <td><input type="text" value="${r[3]}"></td>
+                 </tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('tblWrap').innerHTML = html;
+}
+
+// Toggle Preview
+document.getElementById('togglePreview').addEventListener('click', function(){
+    const text = document.getElementById('raw').value.trim();
+    if(!previewVisible){
+        if(!text){
+            alert('ألصق البيانات أولاً');
+            return;
+        }
+        if(!createdByValue){
+            const inputName = prompt('اكتب اسم Created by:', '');
+            createdByValue = inputName === null || inputName.trim() === '' ? 'غير مخصص' : inputName;
+        }
+        const rows = parseLines(text, createdByValue);
+        buildTable(rows);
+        document.getElementById('tblWrap').style.display = 'block';
+        this.textContent = 'إخفاء المعاينة';
+        previewVisible = true;
+    } else {
+        document.getElementById('tblWrap').style.display = 'none';
+        this.textContent = 'حول الجدول';
+        previewVisible = false;
+    }
+});
+
+// تحميل Excel
+document.getElementById('exportExcel').addEventListener('click', function(){
+    const table = document.getElementById('mainTable');
+    if(!table){
+        alert('لا توجد بيانات للتحميل!');
+        return;
+    }
+    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => {
+        const tds = tr.querySelectorAll('td');
+        return [
+            tds[0].textContent,
+            tds[1].textContent,
+            tds[2].textContent,
+            tds[3].querySelector('input').value
+        ];
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...rows]);
+    XLSX.utils.book_append_sheet(wb, ws, "Table");
+    XLSX.writeFile(wb, "Data.xlsx");
+});
+
+// تغيير Created by لجميع الصفوف
+document.getElementById('changeCreatedBy').addEventListener('click', function(){
+    const table = document.getElementById('mainTable');
+    if(!table){
+        alert('لا توجد بيانات لتغيير Created by!');
+        return;
+    }
+    const newName = prompt('اكتب الاسم الجديد لـ Created by:', '');
+    if(newName === null) return;
+    const finalName = newName.trim() === '' ? 'غير مخصص' : newName.trim();
+    table.querySelectorAll('tbody tr').forEach(tr=>{
+        const input = tr.querySelector('td:nth-child(4) input');
+        if(input) input.value = finalName;
+    });
+    createdByValue = finalName;
+});
+</script>
+
+</body>
+</html>
