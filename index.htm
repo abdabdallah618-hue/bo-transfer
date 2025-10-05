@@ -207,17 +207,6 @@ let rawDataNew = [];
 let previewVisibleNew = false;
 let createdByNew = 'غير مخصص';
 
-// مصفوفة Zones مسبقة
-const predefinedZones = {
-  "FMS0464": "FMS0464-3",
-  "FMS0465": "FMS0465-3",
-  "FMS0466": "FMS0466-2",
-  "FMS0467": "FMS0467-2",
-  "FMS0468": "FMS0468-2",
-  "FMS0469": "FMS0469-3",
-  "FMS0470": "FMS0470-2"
-};
-
 // رفع Excel واستخراج Device Username و Zone
 document.getElementById('loadExcel').addEventListener('click', () => {
     const fileInput = document.getElementById('excelFile');
@@ -243,16 +232,12 @@ document.getElementById('loadExcel').addEventListener('click', () => {
     reader.readAsArrayBuffer(file);
 });
 
-// إنشاء جدول تعديل Zone مع القيم المسبقة
+// إنشاء جدول تعديل Zone
 function buildZoneMapping(data){
     const uniqueZones = [...new Set(data.map(d => d.zone))];
     let html = '<table><thead><tr><th>Zone القديم</th><th>Zone الجديد</th></tr></thead><tbody>';
     uniqueZones.forEach(z=>{
-        const newZone = predefinedZones[z] || ""; // يتم ملؤه مسبقاً
-        html += `<tr>
-                    <td>${z}</td>
-                    <td><input class="zone-new" type="text" value="${newZone}"></td>
-                 </tr>`;
+        html += `<tr><td>${z}</td><td><input class="zone-new" type="text" placeholder="اكتب Zone الجديد"></td></tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('zoneMapping').innerHTML = html;
