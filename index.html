@@ -404,9 +404,9 @@ function parseLinesOld(text, createdBy){
     return text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(line=>{
         var parts = line.split(/\t|\s+/);
         if(parts.length < 3) return null;
-        var contract = parts[0];
-        var zone = parts[1];
-        var fdt = cleanZeros(parts[2]);
+        var contract = parts[0];         // العمود الأول: اليوزرية (Contract)
+        var zone = parts[2];             // العمود الثاني في الناتج = العمود الثالث الملصق
+        var fdt = cleanZeros(parts[2]);  // FDT = Zone بعد التنظيف فقط
         return [contract, zone, fdt, createdBy];
     }).filter(Boolean);
 }
