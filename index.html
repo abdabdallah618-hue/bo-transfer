@@ -330,8 +330,139 @@ input[type="text"].zone-new {
     </div>
     <h2>Users Transfer</h2>
     <!-- النظام القديم -->
-    <label for="raw" style="font-weight:600; color:#00d2ff;">Users Transfer:</label>
-    <textarea id="raw" placeholder="ألصق البيانات الثلاثة أعمدة هنا" style="resize: both !important; min-width: 0 !important; min-height: 480px !important; max-width: none !important; max-height: none !important; width: 1200px !important; height: 480px !important; box-sizing: border-box; margin: 32px 0 32px 0; display: block; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; color: #e3e8ee; padding: 14px; font-size: 1.05rem;" cols="96" rows="24"></textarea>
+        <label for="raw" style="font-weight:600; color:#00d2ff;">Users Transfer:</label>
+        <div class="raw-wrap">
+            <div class="arrange-btn-bar">
+                <button id="arrangeColumnsBtn" class="arrange-btn" title="ترتيب الأعمدة تلقائياً">
+                    <span class="arrange-btn-icon">🔄</span>
+                    <span class="arrange-btn-text">ترتيب الأعمدة</span>
+                </button>
+            </div>
+            <textarea id="raw" placeholder="ألصق هنا بياناتك (3 أعمدة: عقد، زون قديم، زون جديد)" cols="96" rows="16"></textarea>
+        </div>
+<style>
+.raw-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 24px auto 24px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.arrange-btn-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+#raw {
+    resize: both !important;
+    min-width: 320px !important;
+    min-height: 120px !important;
+    max-width: 100vw !important;
+    max-height: 60vh !important;
+    width: 100%;
+    height: 240px;
+    box-sizing: border-box;
+    margin: 0;
+    display: block;
+    background: linear-gradient(120deg,#232526 0%,#1e293b 100%);
+    border: 2.5px solid #00e0b8;
+    border-radius: 18px;
+    color: #e3e8ee;
+    padding: 18px 18px 18px 48px;
+    font-size: 1.13rem;
+    font-family: 'Cairo', system-ui, Arial, sans-serif;
+    box-shadow: 0 4px 32px #00e0b822, 0 1.5px 8px 0 #00e0b822;
+    transition: border 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+#raw:focus {
+    border: 2.5px solid #ffb300;
+    box-shadow: 0 6px 32px #ffb30055, 0 2px 12px #00e0b855;
+}
+.arrange-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 18px 6px 14px;
+    font-size: 1.01rem;
+    font-weight: 800;
+    background: linear-gradient(90deg,#00e0b8 0%,#ffb300 100%);
+    color: #232526;
+    border: none;
+    border-radius: 22px;
+    box-shadow: 0 2px 12px #00e0b822, 0 1.5px 8px 0 #ffb30022;
+    cursor: pointer;
+    transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+    position: relative;
+    margin: 0 auto 0 auto;
+    outline: none;
+    min-width: 90px;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+.arrange-btn:hover, .arrange-btn:focus {
+    background: linear-gradient(90deg,#ffb300 0%,#00e0b8 100%);
+    color: #fff;
+    box-shadow: 0 8px 32px #ffb30077, 0 2px 12px #00e0b855;
+    transform: translateY(-2px) scale(1.08);
+}
+.arrange-btn-icon {
+    font-size: 1.25em;
+    filter: drop-shadow(0 2px 8px #00e0b8aa);
+    margin-left: 2px;
+    transition: filter 0.2s;
+}
+.arrange-btn:hover .arrange-btn-icon, .arrange-btn:focus .arrange-btn-icon {
+    filter: drop-shadow(0 2px 8px #ffb300aa);
+}
+.arrange-btn-text {
+    font-family: inherit;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    font-size: 1.01em;
+}
+@media (max-width: 700px) {
+    .raw-wrap { max-width: 99vw; gap: 4px; }
+    #raw { font-size: 0.98rem; padding: 12px 12px 12px 36px; }
+    .arrange-btn { font-size: 0.93rem; padding: 6px 10px 6px 8px; min-width: 70px; }
+}
+</style>
+<script>
+document.getElementById('arrangeColumnsBtn').addEventListener('click', function(){
+        const textarea = document.getElementById('raw');
+        let text = textarea.value;
+        if(!text.trim()) return;
+        // إزالة الفراغات الزائدة والأسطر الفارغة
+        text = text.replace(/[ \t]+/g, ' ').replace(/\r/g, '').replace(/\n{2,}/g, '\n');
+        const rawLines = text.split(/\n/);
+        const zoneCandidateRegex = /^[A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?$/;
+        const merged = [];
+        for(let i=0;i<rawLines.length;i++){
+                let line = sanitizeToken(rawLines[i]);
+                if(line === '') continue;
+                const tokens = line.split(/\s+/).filter(Boolean);
+                if(tokens.length === 1 && zoneCandidateRegex.test(tokens[0]) && merged.length>0){
+                        const prev = merged[merged.length-1];
+                        const prevTokens = prev.split(/\s+/).filter(Boolean);
+                        if(prevTokens.length === 2){
+                                merged[merged.length-1] = prev + '\t' + tokens[0];
+                                continue;
+                        }
+                }
+                merged.push(line);
+        }
+        // بعد الدمج: فقط الصفوف التي بها 3 أعمدة أو أكثر
+        const arranged = merged
+                .map(line => line.split(/\s+/).map(sanitizeToken).filter(Boolean))
+                .filter(parts => parts.length >= 3)
+                .map(parts => [parts[0], parts[1], parts.slice(2).join(' ')].join('\t'));
+        textarea.value = arranged.join('\n');
+});
+</script>
     <div class="buttons-wrapper">
     <button id="togglePreviewOld">Preview EXCEL Transfer NEW</button>
         <!-- Popup for Created by -->
@@ -414,30 +545,63 @@ function addZeros(zone) {
     return zone;
 }
 
+// إزالة المحارف الخفية (مسافات غير منقطعة / علامات اتجاه) وتوحيد المسافات
+function sanitizeToken(str){
+    if(!str) return '';
+    return str
+        .replace(/\u00A0/g,' ')              // nbsp -> space
+        .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'') // علامات اتجاه
+        .trim();
+}
+
 function parseLinesOld(text, createdBy){
     let errorUsers = [];
-    const rows = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(line=>{
-        var parts = line.split(/\t|\s+/);
-        if(parts.length < 3) return null;
-        var contract = parts[0];
-        var zoneOld = addZeros(parts[1]);
-        var zone = addZeros(parts[2]);
-        var fdt = cleanZeros(parts[2]);
-        // تحقق من التشابه فقط إذا كانت القيم غير فارغة
-        if(zoneOld && zone && zoneOld !== '' && zone !== '') {
-            let z1 = zone.trim().toUpperCase();
-            let z2 = zoneOld.trim().toUpperCase();
-            // السماح بالنقل إذا كان الفرق فقط في الرقم بعد الشرطة
-            const base1 = z1.replace(/-\d+$/, '');
-            const base2 = z2.replace(/-\d+$/, '');
-            if(!(z1.includes(z2) || z2.includes(z1) || base1 === base2)) {
-                console.log('❗️مشكلة في السطر:', parts, '| contract:', contract, '| zoneOld:', z2, '| zone:', z1);
-                errorUsers.push(contract);
-                return null; // حذف من الجدول
+    // 1) تجهيز الأسطر الخام (قد يكون العمود الثالث في سطر منفصل)‏
+    const rawLines = text.split(/\r?\n/);
+    const zoneCandidateRegex = /^[A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?$/; // مثل FBB0266-5
+    const merged = [];
+    for(let i=0;i<rawLines.length;i++){
+        let line = sanitizeToken(rawLines[i]);
+        if(line === '') continue; // تجاهل الفراغات
+        const tokens = line.split(/\s+/).filter(Boolean);
+        // إذا كان السطر يحتوي توكن واحد وهو Zone جديد، والسطر السابق لديه فقط عمودين (عقد + زون قديم) فادمجه
+        if(tokens.length === 1 && zoneCandidateRegex.test(tokens[0]) && merged.length>0){
+            const prev = merged[merged.length-1];
+            const prevTokens = prev.split(/\s+/).filter(Boolean);
+            if(prevTokens.length === 2){
+                merged[merged.length-1] = prev + '\t' + tokens[0];
+                continue;
             }
         }
-        return [contract, zone, fdt, createdBy];
-    }).filter(Boolean);
+        merged.push(line);
+    }
+
+    const rows = merged
+        .map(line=>{
+            let parts = line.split(/\s+/).map(sanitizeToken).filter(Boolean);
+            if(parts.length < 3) return null; // الآن يجب توفر 3 أعمدة بعد الدمج
+            const contract = parts[0];
+            const zoneOldRaw = parts[1];
+            const zoneNewRaw = parts[parts.length - 1];
+            const zoneOld = addZeros(zoneOldRaw);
+            const zoneOriginalToken = zoneNewRaw;
+            const zone = addZeros(zoneOriginalToken);
+            const fdt = cleanZeros(zoneOriginalToken);
+
+            let error = false;
+            if(zoneOld && zone) {
+                let z1 = zone.trim().toUpperCase();
+                let z2 = zoneOld.trim().toUpperCase();
+                const base1 = z1.replace(/-\d+$/, '');
+                const base2 = z2.replace(/-\d+$/, '');
+                if(!(z1.includes(z2) || z2.includes(z1) || base1 === base2)) {
+                    error = true;
+                    errorUsers.push(contract + ' ('+ z2 + ' → ' + z1 +')');
+                }
+            }
+            return { contract, zone, fdt, createdBy, error };
+        })
+        .filter(Boolean);
     if(errorUsers.length > 0) {
         showErrorPopup(errorUsers);
     }
@@ -471,14 +635,16 @@ function buildTableOld(rows){
         return;
     }
     let html = '<table id="mainTableOld"><thead><tr>'+
-               '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th>'+
+               '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th><th>Status</th>'+
                '</tr></thead><tbody>';
     rows.forEach(r=>{
-        html += `<tr>
-                    <td>${r[0]}</td>
-                    <td>${r[1]}</td>
-                    <td>${r[2]}</td>
-                    <td><input type="text" value="${r[3]}"></td>
+        const rowClass = r.error ? ' class="row-error"' : '';
+        html += `<tr${rowClass}>
+                    <td>${r.contract}</td>
+                    <td>${r.zone}</td>
+                    <td>${r.fdt}</td>
+                    <td><input type="text" value="${r.createdBy}"></td>
+                    <td>${r.error?'<span style="color:#f87171;font-weight:700;">Mismatch</span>':'<span style="color:#22c55e;font-weight:700;">OK</span>'}</td>
                  </tr>`;
     });
     html += '</tbody></table>';
@@ -550,10 +716,11 @@ document.getElementById('exportExcelOld').addEventListener('click', function(){
     if(!table){ alert('لا توجد بيانات للتحميل!'); return; }
     const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => {
         const tds = tr.querySelectorAll('td');
-        return [tds[0].textContent, tds[1].textContent, tds[2].textContent, tds[3].querySelector('input').value];
+        // الأعمدة: 0 Contract, 1 Zone, 2 FDT, 3 Created by (input), 4 Status
+        return [tds[0].textContent, tds[1].textContent, tds[2].textContent, tds[3].querySelector('input').value, tds[4].innerText];
     });
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...rows]);
+    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by","Status"], ...rows]);
     XLSX.utils.book_append_sheet(wb, ws, "Table");
     XLSX.writeFile(wb, "OldData.xlsx");
 });
