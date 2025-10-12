@@ -647,17 +647,17 @@ function buildTableOld(rows){
         return;
     }
         let html = '<table id="mainTableOld"><thead><tr>' +
-                   '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th>' +
+                   '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th><th>Status</th>' +
                '</tr></thead><tbody>';
     rows.forEach(r=>{
         const rowClass = r.error ? ' class="row-error"' : '';
-        html += `<tr${rowClass}>
-                    <td>${r.contract}</td>
-                    <td>${r.zone}</td>
-                    <td>${r.fdt}</td>
-                    <td><input type="text" value="${r.createdBy}"></td>
-                    <td>${r.error?'<span style="color:#f87171;font-weight:700;">Mismatch</span>':'<span style="color:#22c55e;font-weight:700;">OK</span>'}</td>
-                 </tr>`;
+          html += `<tr${rowClass}>
+                          <td>${r.contract}</td>
+                          <td>${r.zone}</td>
+                          <td>${r.fdt}</td>
+                          <td><input type="text" value="${r.createdBy}"></td>
+                          <td>${r.error?'<span style="color:#f87171;font-weight:700;">Mismatch</span>':'<span style="color:#22c55e;font-weight:700;">OK</span>'}</td>
+                      </tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('tblWrapOld').innerHTML = html;
