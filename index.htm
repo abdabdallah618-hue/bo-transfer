@@ -445,34 +445,46 @@ FBS11FAT7PORT5ah	FBS0011	FBS0011-7</textarea>
 </style>
 <script>
 document.getElementById('arrangeColumnsBtn').addEventListener('click', function(){
-        const textarea = document.getElementById('raw');
-        let text = textarea.value;
-        if(!text.trim()) return;
-        // إزالة الفراغات الزائدة والأسطر الفارغة
-        text = text.replace(/[ \t]+/g, ' ').replace(/\r/g, '').replace(/\n{2,}/g, '\n');
-        const rawLines = text.split(/\n/);
-        const zoneCandidateRegex = /^[A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?$/;
-        const merged = [];
-        for(let i=0;i<rawLines.length;i++){
-                let line = sanitizeToken(rawLines[i]);
-                if(line === '') continue;
-                const tokens = line.split(/\s+/).filter(Boolean);
-                if(tokens.length === 1 && zoneCandidateRegex.test(tokens[0]) && merged.length>0){
-                        const prev = merged[merged.length-1];
-                        const prevTokens = prev.split(/\s+/).filter(Boolean);
-                        if(prevTokens.length === 2){
-                                merged[merged.length-1] = prev + '\t' + tokens[0];
-                                continue;
-                        }
-                }
-                merged.push(line);
+    const textarea = document.getElementById('raw');
+    let text = textarea.value;
+    if(!text.trim()) return;
+    // إزالة الفراغات الزائدة والأسطر الفارغة
+    text = text.replace(/[ \t]+/g, ' ').replace(/\r/g, '').replace(/\n{2,}/g, '\n');
+    let rawLines = text.split(/\n/).map(sanitizeToken).filter(Boolean);
+
+    // معالجة الأعمدة الملتصقة: إذا وُجد عمود فيه ZoneZone (مثلاً FBG1498-2FBG1498-3)
+    const zonePattern = /([A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?)/g;
+    rawLines = rawLines.map(line => {
+        // إذا كان السطر يحوي عمودين فقط لكن الثاني طويل جداً أو فيه ZoneZone
+        const tokens = line.split(/\s+/).filter(Boolean);
+        if(tokens.length === 2 && /([A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?){2,}/.test(tokens[1])){
+            // حاول الفصل
+            const zones = tokens[1].match(zonePattern);
+            if(zones && zones.length === 2){
+                return tokens[0] + '\t' + zones[0] + '\t' + zones[1];
+            }
         }
-        // بعد الدمج: فقط الصفوف التي بها 3 أعمدة أو أكثر
-        const arranged = merged
-                .map(line => line.split(/\s+/).map(sanitizeToken).filter(Boolean))
-                .filter(parts => parts.length >= 3)
-                .map(parts => [parts[0], parts[1], parts.slice(2).join(' ')].join('\t'));
+        return line;
+    });
+
+    // إذا كانت معظم الأسطر أحادية العمود (عمودي)، حولها لأفقية
+    const singleColCount = rawLines.filter(l => l.split(/\s+/).filter(Boolean).length === 1).length;
+    if(singleColCount >= rawLines.length * 0.7 && rawLines.length >= 3){
+        // عمودي: كل 3 أسطر = صف أفقي
+        let arranged = [];
+        for(let i=0; i<rawLines.length; i+=3){
+            const group = rawLines.slice(i, i+3);
+            if(group.length === 3){
+                arranged.push(group.join('\t'));
+            } else {
+                arranged = arranged.concat(group); // أضف الباقي كما هو
+            }
+        }
         textarea.value = arranged.join('\n');
+    } else {
+        // أفقية أو مختلطة: لا تغيّر
+        textarea.value = rawLines.join('\n');
+    }
 });
 </script>
     <div class="buttons-wrapper">
@@ -522,7 +534,7 @@ document.getElementById('arrangeColumnsBtn').addEventListener('click', function(
     <div id="tblWrapNew" style="display:none;"></div>
 </div>
 
-<script src="Users%20Transfer_files/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 // Show confirmation when Excel file is uploaded
 const excelInput = document.getElementById('excelFile');
@@ -568,38 +580,44 @@ function sanitizeToken(str){
 
 function parseLinesOld(text, createdBy){
     let errorUsers = [];
-    // 1) تجهيز الأسطر الخام (قد يكون العمود الثالث في سطر منفصل)‏
-    const rawLines = text.split(/\r?\n/);
-    const zoneCandidateRegex = /^[A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?$/; // مثل FBB0266-5
-    const merged = [];
-    for(let i=0;i<rawLines.length;i++){
-        let line = sanitizeToken(rawLines[i]);
-        if(line === '') continue; // تجاهل الفراغات
+    const rawLines = text.split(/\r?\n/).map(sanitizeToken).filter(Boolean);
+    const rows = [];
+    let buffer = [];
+    for(let i=0; i<rawLines.length; i++){
+        const line = rawLines[i];
         const tokens = line.split(/\s+/).filter(Boolean);
-        // إذا كان السطر يحتوي توكن واحد وهو Zone جديد، والسطر السابق لديه فقط عمودين (عقد + زون قديم) فادمجه
-        if(tokens.length === 1 && zoneCandidateRegex.test(tokens[0]) && merged.length>0){
-            const prev = merged[merged.length-1];
-            const prevTokens = prev.split(/\s+/).filter(Boolean);
-            if(prevTokens.length === 2){
-                merged[merged.length-1] = prev + '\t' + tokens[0];
-                continue;
+        if(tokens.length === 1){
+            buffer.push(tokens[0]);
+            if(buffer.length === 3){
+                // كل 3 أسطر = صف واحد
+                const [contract, zoneOldRaw, zoneNewRaw] = buffer;
+                const zoneOld = addZeros(zoneOldRaw);
+                const zoneOriginalToken = zoneNewRaw;
+                const zone = addZeros(zoneOriginalToken);
+                const fdt = cleanZeros(zoneOriginalToken);
+                let error = false;
+                if(zoneOld && zone) {
+                    let z1 = zone.trim().toUpperCase();
+                    let z2 = zoneOld.trim().toUpperCase();
+                    const base1 = z1.replace(/-\d+$/, '');
+                    const base2 = z2.replace(/-\d+$/, '');
+                    if(!(z1.includes(z2) || z2.includes(z1) || base1 === base2)) {
+                        error = true;
+                        errorUsers.push(contract + ' ('+ z2 + ' → ' + z1 +')');
+                    }
+                }
+                rows.push({ contract, zone, fdt, createdBy, error });
+                buffer = [];
             }
-        }
-        merged.push(line);
-    }
-
-    const rows = merged
-        .map(line=>{
-            let parts = line.split(/\s+/).map(sanitizeToken).filter(Boolean);
-            if(parts.length < 3) return null; // الآن يجب توفر 3 أعمدة بعد الدمج
-            const contract = parts[0];
-            const zoneOldRaw = parts[1];
-            const zoneNewRaw = parts[parts.length - 1];
+        } else if(tokens.length >= 3){
+            // سطر واحد فيه 3 أعمدة أو أكثر
+            const contract = tokens[0];
+            const zoneOldRaw = tokens[1];
+            const zoneNewRaw = tokens[tokens.length - 1];
             const zoneOld = addZeros(zoneOldRaw);
             const zoneOriginalToken = zoneNewRaw;
             const zone = addZeros(zoneOriginalToken);
             const fdt = cleanZeros(zoneOriginalToken);
-
             let error = false;
             if(zoneOld && zone) {
                 let z1 = zone.trim().toUpperCase();
@@ -611,9 +629,11 @@ function parseLinesOld(text, createdBy){
                     errorUsers.push(contract + ' ('+ z2 + ' → ' + z1 +')');
                 }
             }
-            return { contract, zone, fdt, createdBy, error };
-        })
-        .filter(Boolean);
+            rows.push({ contract, zone, fdt, createdBy, error });
+            buffer = [];
+        }
+        // إذا tokens.length == 2 أو غير ذلك، تجاهل السطر
+    }
     if(errorUsers.length > 0) {
         showErrorPopup(errorUsers);
     }
@@ -916,4 +936,3 @@ document.getElementById('exportExcelNew').addEventListener('click', ()=>{
 
 
 </body></html>
-
