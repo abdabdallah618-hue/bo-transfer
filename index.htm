@@ -448,17 +448,37 @@ document.getElementById('arrangeColumnsBtn').addEventListener('click', function(
     const textarea = document.getElementById('raw');
     let text = textarea.value;
     if(!text.trim()) return;
-    // إزالة الفراغات الزائدة والأسطر الفارغة
+    // إذا كان النص عبارة عن عدة أسطر وكل سطر فيه تاب (أي لصق مباشر من Excel)
+    const lines = text.split(/\n/);
+    const excelLike = lines.length > 1 && lines.every(line => line.split('\t').length >= 2);
+    if(excelLike) {
+        // لا تغيّر شيئاً، فقط أعد تجميع الأسطر كما هي
+        textarea.value = lines.join('\n');
+        return;
+    }
+    // معالجة خاصّة: إذا كان النص يحتوي على أعمدة Excel مفصولة بتاب وبعض الخلايا فيها أسطر جديدة (حالة الأعمدة العمودية)
+    if(/\t/.test(text) && /\n/.test(text)){
+        let columns = text.split(/\t/);
+        if(columns.length >= 2){
+            let colArrays = columns.map(col => col.replace(/^"|"$/g, '').split(/\n/));
+            let maxLen = Math.max(...colArrays.map(arr => arr.length));
+            let arranged = [];
+            for(let i=0; i<maxLen; i++){
+                let row = colArrays.map(arr => (i < arr.length ? arr[i] : ''));
+                while(row.length < columns.length) row.push('');
+                arranged.push(row.join('\t'));
+            }
+            textarea.value = arranged.join('\n');
+            return;
+        }
+    }
+    // ...باقي الكود القديم...
     text = text.replace(/[ \t]+/g, ' ').replace(/\r/g, '').replace(/\n{2,}/g, '\n');
     let rawLines = text.split(/\n/).map(sanitizeToken).filter(Boolean);
-
-    // معالجة الأعمدة الملتصقة: إذا وُجد عمود فيه ZoneZone (مثلاً FBG1498-2FBG1498-3)
     const zonePattern = /([A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?)/g;
     rawLines = rawLines.map(line => {
-        // إذا كان السطر يحوي عمودين فقط لكن الثاني طويل جداً أو فيه ZoneZone
         const tokens = line.split(/\s+/).filter(Boolean);
         if(tokens.length === 2 && /([A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?){2,}/.test(tokens[1])){
-            // حاول الفصل
             const zones = tokens[1].match(zonePattern);
             if(zones && zones.length === 2){
                 return tokens[0] + '\t' + zones[0] + '\t' + zones[1];
@@ -466,25 +486,26 @@ document.getElementById('arrangeColumnsBtn').addEventListener('click', function(
         }
         return line;
     });
-
-    // إذا كانت معظم الأسطر أحادية العمود (عمودي)، حولها لأفقية
+    const horizontalCount = rawLines.filter(l => l.split(/\s+/).filter(Boolean).length >= 3).length;
     const singleColCount = rawLines.filter(l => l.split(/\s+/).filter(Boolean).length === 1).length;
+    if(horizontalCount >= rawLines.length * 0.7 && rawLines.length >= 3){
+        textarea.value = rawLines.join('\n');
+        return;
+    }
     if(singleColCount >= rawLines.length * 0.7 && rawLines.length >= 3){
-        // عمودي: كل 3 أسطر = صف أفقي
         let arranged = [];
         for(let i=0; i<rawLines.length; i+=3){
             const group = rawLines.slice(i, i+3);
             if(group.length === 3){
                 arranged.push(group.join('\t'));
             } else {
-                arranged = arranged.concat(group); // أضف الباقي كما هو
+                arranged = arranged.concat(group);
             }
         }
         textarea.value = arranged.join('\n');
-    } else {
-        // أفقية أو مختلطة: لا تغيّر
-        textarea.value = rawLines.join('\n');
+        return;
     }
+    textarea.value = rawLines.join('\n');
 });
 </script>
     <div class="buttons-wrapper">
@@ -580,16 +601,23 @@ function sanitizeToken(str){
 
 function parseLinesOld(text, createdBy){
     let errorUsers = [];
+    let missingUsers = [];
     const rawLines = text.split(/\r?\n/).map(sanitizeToken).filter(Boolean);
     const rows = [];
     let buffer = [];
     for(let i=0; i<rawLines.length; i++){
         const line = rawLines[i];
-        const tokens = line.split(/\s+/).filter(Boolean);
+        // استخدم التاب للفصل أولاً إذا موجود، وإلا المسافة
+        const tokens = line.includes('\t') ? line.split('\t') : line.split(/\s+/);
+        // إذا كان هناك نقص في أي حقل
+        if(tokens.length === 3 && (tokens[0].trim() === '' || tokens[1].trim() === '' || tokens[2].trim() === '')){
+            rows.push({ contract: tokens[0]||'', zone: tokens[1]||'', fdt: tokens[2]||'', createdBy, error: true, missing: true });
+            missingUsers.push('صف به نقص: ' + (tokens[0]||'') + ' | ' + (tokens[1]||'') + ' | ' + (tokens[2]||''));
+            continue;
+        }
         if(tokens.length === 1){
             buffer.push(tokens[0]);
             if(buffer.length === 3){
-                // كل 3 أسطر = صف واحد
                 const [contract, zoneOldRaw, zoneNewRaw] = buffer;
                 const zoneOld = addZeros(zoneOldRaw);
                 const zoneOriginalToken = zoneNewRaw;
@@ -610,7 +638,6 @@ function parseLinesOld(text, createdBy){
                 buffer = [];
             }
         } else if(tokens.length >= 3){
-            // سطر واحد فيه 3 أعمدة أو أكثر
             const contract = tokens[0];
             const zoneOldRaw = tokens[1];
             const zoneNewRaw = tokens[tokens.length - 1];
@@ -624,7 +651,7 @@ function parseLinesOld(text, createdBy){
                 let z2 = zoneOld.trim().toUpperCase();
                 const base1 = z1.replace(/-\d+$/, '');
                 const base2 = z2.replace(/-\d+$/, '');
-                if(!(z1.includes(z2) || z2.includes(z1) || base1 === base2)) {
+                if(base1 !== base2) {
                     error = true;
                     errorUsers.push(contract + ' ('+ z2 + ' → ' + z1 +')');
                 }
@@ -632,9 +659,11 @@ function parseLinesOld(text, createdBy){
             rows.push({ contract, zone, fdt, createdBy, error });
             buffer = [];
         }
-        // إذا tokens.length == 2 أو غير ذلك، تجاهل السطر
     }
-    if(errorUsers.length > 0) {
+    // أظهر تنبيه إذا كان هناك صفوف ناقصة
+    if(missingUsers.length > 0) {
+        showErrorPopup(missingUsers);
+    } else if(errorUsers.length > 0) {
         showErrorPopup(errorUsers);
     }
     return rows;
@@ -666,18 +695,26 @@ function buildTableOld(rows){
         document.getElementById('tblWrapOld').innerHTML = '<p>لا توجد بيانات.</p>';
         return;
     }
-        let html = '<table id="mainTableOld"><thead><tr>' +
-                   '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th>' +
-               '</tr></thead><tbody>';
+    let html = '<table id="mainTableOld"><thead><tr>' +
+               '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th><th>Status</th>' +
+           '</tr></thead><tbody>';
     rows.forEach(r=>{
-        const rowClass = r.error ? ' class="row-error"' : '';
-          html += `<tr${rowClass}>
-                          <td>${r.contract}</td>
-                          <td>${r.zone}</td>
-                          <td>${r.fdt}</td>
-                          <td><input type="text" value="${r.createdBy}"></td>
-                        
-                      </tr>`;
+        let statusIcon = '✔️';
+        let rowClass = '';
+        if(r.missing) {
+            statusIcon = '❌';
+            rowClass = ' class="row-error"';
+        } else if(r.error) {
+            statusIcon = '❌';
+            rowClass = ' class="row-error"';
+        }
+        html += `<tr${rowClass}>
+                      <td>${r.contract}</td>
+                      <td>${r.zone}</td>
+                      <td>${r.fdt}</td>
+                      <td><input type="text" value="${r.createdBy}"></td>
+                      <td>${statusIcon}${r.missing ? ' (نقص بيانات)' : ''}</td>
+                  </tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('tblWrapOld').innerHTML = html;
