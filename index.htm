@@ -6,301 +6,169 @@
 <title>Users Transfer</title>
 <link href="Users%20Transfer_files/css2.css" rel="stylesheet">
 <style>
+/* Theme variables */
+:root {
+  --bg-start: #0f172a; /* slate-900 */
+  --bg-end: #111827;   /* gray-900 */
+  --surface: #0b1220;  /* deep surface */
+  --surface-2: #111827;/* surface variant */
+  --text: #e5e7eb;     /* text */
+  --muted: #64748b;    /* slate-500 */
+  --primary: #6366f1;  /* indigo-500 */
+  --primary-2: #22d3ee;/* cyan-400 */
+  --accent: #10b981;   /* emerald-500 */
+  --danger: #ef4444;   /* red-500 */
+  --ring: rgba(99, 102, 241, 0.35);
+}
+
+* { box-sizing: border-box; }
+
 body {
-    font-family: 'Cairo', system-ui, Arial, sans-serif;
-    direction: rtl;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    min-width: 100vw;
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(120deg, #232526 0%, #1e293b 100%);
-    color: #e3e8ee;
-    min-height: 100vh;
-    min-width: 100vw;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  font-family: 'Cairo', system-ui, Arial, sans-serif;
+  direction: rtl;
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(99,102,241,0.10), transparent 40%),
+              radial-gradient(800px 400px at 90% 10%, rgba(34,211,238,0.08), transparent 40%),
+              linear-gradient(120deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  color: var(--text);
 }
+
 .container {
-    width: 100vw;
-    height: 100vh;
-    min-height: 100vh;
-    min-width: 100vw;
-    background: transparent;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 0 0 0 0;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    position: static;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 16px 40px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 22px;
 }
+
 h2 {
-    text-align: center;
-    margin-bottom: 32px;
-    color: #38bdf8;
-    font-size: 3vw;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 16px #38bdf855;
+  text-align: center;
+  margin: 10px 0 4px 0;
+  color: var(--primary);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
 }
-label {
-    color: #38bdf8;
-    font-weight: 700;
-    margin-bottom: 6px;
-    display: block;
-    font-size: 1.08rem;
-}
-textarea, input[type="file"] {
-    width: 100%;
-    margin-bottom: 18px;
-    background: #1e293b;
-    border: 1.5px solid #334155;
-    border-radius: 12px;
-    color: #e3e8ee;
-    padding: 14px;
-    font-size: 1.05rem;
-    transition: border 0.2s, box-shadow 0.2s;
-    box-shadow: 0 1.5px 8px 0 #38bdf822;
-    resize: both;
-}
-#raw {
-  resize: both !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: none !important;
-  max-height: none !important;
-  width: 1200px !important;
-  height: 240px !important;
-  box-sizing: border-box;
-  margin: 24px 0 24px 0;
+
+.section-title {
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 8px;
   display: block;
+  font-size: 1.08rem;
+  text-align: center;
 }
-.excel-upload-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 18px;
-    width: 100%;
+
+.card {
+  background: linear-gradient(180deg, rgba(17,24,39,0.65) 0%, rgba(11,18,32,0.9) 100%);
+  border: 1px solid rgba(148,163,184,0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(2,6,23,0.45), inset 0 1px 0 rgba(255,255,255,0.03);
+  padding: 18px 14px 20px 14px;
 }
+
+textarea, input[type="file"], input[type="text"] {
+  width: 100%;
+  margin-bottom: 14px;
+  background: var(--surface-2);
+  border: 1.5px solid rgba(148,163,184,0.22);
+  border-radius: 12px;
+  color: var(--text);
+  padding: 12px 14px;
+  font-size: 1.02rem;
+  transition: border 0.18s, box-shadow 0.18s, transform 0.06s;
+}
+
+textarea:focus, input[type="file"]:focus, input[type="text"]:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.excel-upload-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.excel-upload-input { display: none; }
 .excel-upload-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background: linear-gradient(90deg,#38bdf8 0%,#0ea5e9 100%);
-    color: #fff;
-    padding: 8px 0;
-    border-radius: 14px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 2px 12px #38bdf822;
-    margin-bottom: 10px;
-    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
-    width: 270px;
-    min-width: 200px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-size: 1.06rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 28px rgba(99,102,241,0.25);
+  min-width: 230px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
-.excel-upload-label:hover {
-    background: linear-gradient(90deg,#0ea5e9 0%,#38bdf8 100%);
-    box-shadow: 0 4px 24px #38bdf855;
-    transform: translateY(-2px) scale(1.04);
-}
-.excel-upload-label svg {
-    width: 32px;
-    height: 32px;
-    fill: #fff;
-}
-.excel-upload-input {
-    display: none;
-}
-textarea:focus, input[type="file"]:focus {
-    border: 1.5px solid #38bdf8;
-    outline: none;
-    box-shadow: 0 2px 12px 0 #38bdf855;
-}
+.excel-upload-label:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(99,102,241,0.35); filter: saturate(1.15); }
+.excel-upload-label svg { width: 28px; height: 28px; fill: #fff; }
+
 button {
-    padding: 13px 32px;
-    margin: 8px 4px;
-    cursor: pointer;
-    transition: 0.18s;
-    background: linear-gradient(90deg,#38bdf8 0%,#0ea5e9 100%);
-    color: #fff;
-    border: none;
-    border-radius: 14px;
-    font-size: 1.3rem;
-    font-weight: 700;
-    box-shadow: 0 2px 12px #38bdf822;
-    letter-spacing: 0.5px;
+  padding: 11px 22px;
+  margin: 6px 4px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%);
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  box-shadow: 0 6px 24px rgba(99,102,241,0.25);
 }
-button:hover {
-    background: linear-gradient(90deg,#0ea5e9 0%,#38bdf8 100%);
-    box-shadow: 0 4px 24px #38bdf855;
-    transform: translateY(-2px) scale(1.04);
-}
-.buttons-wrapper {
-    text-align: center;
-    margin-bottom: 20px;
-}
+button:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 10px 34px rgba(99,102,241,0.35); filter: saturate(1.1); }
+button:active { transform: translateY(0) scale(0.99); }
+
+.buttons-wrapper { text-align: center; margin: 10px 0 6px 0; }
+
 table {
-    width: 80vw;
-    max-width: 1100px;
-    min-width: 350px;
-    margin: 32px auto 0 auto;
-    border-collapse: collapse;
-    background: #1e293b;
-    box-shadow: 0 0 18px #38bdf822;
-    border-radius: 16px;
-    overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px auto 0 auto;
+  background: linear-gradient(180deg, rgba(17,24,39,0.7) 0%, rgba(11,18,32,0.95) 100%);
+  border: 1px solid rgba(148,163,184,0.18);
+  box-shadow: 0 10px 40px rgba(2,6,23,0.5);
+  border-radius: 14px;
+  overflow: hidden;
 }
 th, td {
-    border: 1px solid #334155;
-    padding: 14px 12px;
-    text-align: center;
-    font-size: 1.1rem;
-    min-width: 100px;
-    background: #232931;
-    color: #38bdf8;
-    font-weight: 700;
+  border-top: 1px solid rgba(148,163,184,0.18);
+  border-left: 1px solid rgba(148,163,184,0.10);
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 1rem;
 }
+thead th {
+  background: linear-gradient(90deg, rgba(99,102,241,0.18) 0%, rgba(34,211,238,0.18) 100%);
+  color: var(--primary-2);
+}
+tbody td { color: var(--text); }
+.row-error td { background: rgba(239,68,68,0.10); color: #fecaca; }
+
 input[type="text"].zone-new {
-    width: 100%;
-    padding: 8px;
-    border-radius: 8px;
-    border: 1.5px solid #334155;
-    background: #1e293b;
-    color: #e3e8ee;
-    font-size: 1.05rem;
+  padding: 9px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1.5px solid rgba(148,163,184,0.22);
+  color: var(--text);
 }
-.separator {
-    height: 2.5px;
-    background: linear-gradient(90deg,#38bdf8 0%,#0ea5e9 100%);
-    margin: 44px 0 36px 0;
-    border-radius: 2px;
-    opacity: 0.8;
-}
+
+.separator { height: 2px; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%); opacity: 0.75; border-radius: 2px; margin: 22px 0; }
+
 @media (max-width: 900px) {
-    .container {
-        padding: 18px 6px 18px 6px;
-        width: 99vw;
-        min-height: 99vh;
-    }
-    h2 {
-        font-size: 1.3rem;
-    }
-    button {
-        padding: 10px 10px;
-        font-size: 0.95rem;
-    }
-    th, td {
-        font-size: 0.9rem;
-        padding: 7px 2px;
-    }
-}
-h2 {
-    text-align: center;
-    margin-bottom: 28px;
-    color: #00d2ff;
-    font-size: 2.2rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 16px #00d2ff44;
-}
-textarea, input[type="file"] {
-    width: 100%;
-    margin-bottom: 16px;
-    background: #232931;
-    border: 1px solid #393e46;
-    border-radius: 10px;
-    color: #f5f6fa;
-    padding: 12px;
-    font-size: 1rem;
-    transition: border 0.2s;
-    resize: both;
-}
-textarea:focus, input[type="file"]:focus {
-    border: 1.5px solid #00d2ff;
-    outline: none;
-}
-button {
-    padding: 12px 28px;
-    margin: 7px 4px;
-    cursor: pointer;
-    transition: 0.2s;
-    background: linear-gradient(90deg,#00d2ff 0%,#3a7bd5 100%);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    box-shadow: 0 2px 12px rgba(0,210,255,0.12);
-    letter-spacing: 0.5px;
-}
-button:hover {
-    background: linear-gradient(90deg,#3a7bd5 0%,#00d2ff 100%);
-    box-shadow: 0 4px 24px rgba(0,210,255,0.18);
-    transform: translateY(-2px) scale(1.03);
-}
-.buttons-wrapper {
-    text-align: center;
-    margin-bottom: 18px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 18px;
-    background: #232931;
-    box-shadow: 0 0 18px rgba(0,210,255,0.08);
-    border-radius: 10px;
-    overflow: hidden;
-}
-th, td {
-    border: 1px solid #393e46;
-    padding: 12px 8px;
-    text-align: center;
-    font-size: 1rem;
-}
-th {
-    background: #393e46;
-    color: #00d2ff;
-    font-weight: 700;
-}
-input[type="text"].zone-new {
-    width: 100%;
-    padding: 7px;
-    border-radius: 7px;
-    border: 1px solid #393e46;
-    background: #232931;
-    color: #f5f6fa;
-    font-size: 1rem;
-}
-.separator {
-    height: 2px;
-    background: linear-gradient(90deg,#00d2ff 0%,#3a7bd5 100%);
-    margin: 40px 0 32px 0;
-    border-radius: 2px;
-    opacity: 0.7;
-}
-@media (max-width: 600px) {
-    .container {
-        padding: 18px 6px 18px 6px;
-    }
-    h2 {
-        font-size: 1.3rem;
-    }
-    button {
-        padding: 10px 10px;
-        font-size: 0.95rem;
-    }
-    th, td {
-        font-size: 0.9rem;
-        padding: 7px 2px;
-    }
+  .container { padding: 18px 10px 26px 10px; }
+  h2 { font-size: 1.35rem; }
+  button { padding: 10px 14px; font-size: 0.98rem; }
+  th, td { font-size: 0.95rem; padding: 9px 6px; }
 }
 </style>
 </head>
@@ -308,29 +176,30 @@ input[type="text"].zone-new {
 
 <div class="container">
     <!-- Popup for assign name before applying new zones -->
-    <div id="assignNamePopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(30,41,59,0.55);z-index:1001;align-items:center;justify-content:center;">
-        <div style="background:#1e293b;padding:32px 24px 24px 24px;border-radius:16px;box-shadow:0 4px 32px #38bdf855;max-width:90vw;width:350px;text-align:center;">
-            <h3 style="color:#38bdf8;margin-bottom:18px;font-size:1.2rem;">Please enter the assign name</h3>
-            <input id="assignNameInput" type="text" placeholder="Enter assign name here" style="width:90%;padding:10px 8px;border-radius:8px;border:1.5px solid #334155;background:#232931;color:#e3e8ee;font-size:1rem;margin-bottom:18px;">
+    <div id="assignNamePopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2,6,23,0.60);z-index:1001;align-items:center;justify-content:center;">
+        <div style="background:var(--surface);padding:26px 22px 20px 22px;border-radius:16px;box-shadow:0 12px 44px rgba(99,102,241,0.28);max-width:90vw;width:360px;text-align:center;border:1px solid rgba(148,163,184,0.16);">
+            <h3 style="color:var(--primary);margin-bottom:16px;font-size:1.15rem;">Please enter the assign name</h3>
+            <input id="assignNameInput" type="text" placeholder="Enter assign name here" style="width:92%;padding:10px 10px;border-radius:10px;border:1.5px solid rgba(148,163,184,0.22);background:var(--surface-2);color:var(--text);font-size:1rem;margin-bottom:16px;outline:none;">
             <div>
                 <button id="assignNameOkBtn" style="margin-left:8px;">OK</button>
-                <button id="assignNameCancelBtn" style="background:#64748b;">Cancel</button>
+                <button id="assignNameCancelBtn" style="background:#475569;">Cancel</button>
             </div>
         </div>
     </div>
     <!-- Popup for new zone confirmation -->
-    <div id="zoneConfirmPopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(30,41,59,0.55);z-index:1000;align-items:center;justify-content:center;">
-        <div style="background:#1e293b;padding:32px 24px 24px 24px;border-radius:16px;box-shadow:0 4px 32px #38bdf855;max-width:90vw;width:350px;text-align:center;">
-            <h3 style="color:#38bdf8;margin-bottom:18px;font-size:1.2rem;">Are you sure about the new zone?</h3>
+    <div id="zoneConfirmPopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2,6,23,0.60);z-index:1000;align-items:center;justify-content:center;">
+        <div style="background:var(--surface);padding:26px 22px 20px 22px;border-radius:16px;box-shadow:0 12px 44px rgba(99,102,241,0.28);max-width:90vw;width:360px;text-align:center;border:1px solid rgba(148,163,184,0.16);">
+            <h3 style="color:var(--primary);margin-bottom:16px;font-size:1.15rem;">Are you sure about the new zone?</h3>
             <div>
                 <button id="zoneConfirmYes" style="margin-left:8px;">Yes</button>
-                <button id="zoneConfirmNo" style="background:#64748b;">No</button>
+                <button id="zoneConfirmNo" style="background:#475569;">No</button>
             </div>
         </div>
     </div>
     <h2>Users Transfer</h2>
     <!-- النظام القديم -->
-        <label for="raw" style="font-weight:600; color:#00d2ff;">Users Transfer:</label>
+    <section class="card">
+        <label for="raw" class="section-title">Users Transfer:</label>
         <div class="raw-wrap">
             <div class="arrange-btn-bar">
                 <button id="arrangeColumnsBtn" class="arrange-btn" title="ترتيب الأعمدة تلقائياً">
@@ -352,6 +221,24 @@ FBS11FAT7PORT2ah	FBS0011	FBS0011-7
 FBS11FAT18PORT15ah	FBS0011	FBS0011-7
 FBS11FAT7PORT5ah	FBS0011	FBS0011-7</textarea>
         </div>
+        <div class="buttons-wrapper">
+            <button id="togglePreviewOld">Preview EXCEL Transfer NEW</button>
+            <!-- Popup for Created by -->
+            <div id="createdByPopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2,6,23,0.60);z-index:1000;align-items:center;justify-content:center;">
+                <div style="background:var(--surface);padding:26px 22px 20px 22px;border-radius:16px;box-shadow:0 12px 44px rgba(99,102,241,0.28);max-width:90vw;width:360px;text-align:center;border:1px solid rgba(148,163,184,0.16);">
+                    <h3 style="color:var(--primary);margin-bottom:16px;font-size:1.2rem;">Assign <span style="color:var(--primary-2)">Created by</span></h3>
+                    <input id="createdByInput" type="text" placeholder="Enter name here" style="width:92%;padding:10px 10px;border-radius:10px;border:1.5px solid rgba(148,163,184,0.22);background:var(--surface-2);color:var(--text);font-size:1rem;margin-bottom:16px;" value="ss">
+                    <div>
+                        <button id="createdByOkBtn" style="margin-left:8px;">OK</button>
+                        <button id="createdByCancelBtn" style="background:#475569;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <button id="exportExcelOld">Download Excel</button>
+            <button id="changeCreatedByOld">Change Created by Assign</button>
+        </div>
+        <div id="tblWrapOld" style="display:none;"></div>
+    </section>
 <style>
 .raw-wrap {
     position: relative;
@@ -373,40 +260,40 @@ FBS11FAT7PORT5ah	FBS0011	FBS0011-7</textarea>
     resize: both !important;
     min-width: 320px !important;
     min-height: 120px !important;
-    max-width: 100vw !important;
+    max-width: 100% !important;
     max-height: 60vh !important;
     width: 100%;
     height: 240px;
     box-sizing: border-box;
     margin: 0;
     display: block;
-    background: linear-gradient(120deg,#232526 0%,#1e293b 100%);
-    border: 2.5px solid #00e0b8;
-    border-radius: 18px;
-    color: #e3e8ee;
-    padding: 18px 18px 18px 48px;
+    background: linear-gradient(120deg, rgba(17,24,39,0.6) 0%, rgba(11,18,32,0.95) 100%);
+    border: 2px solid rgba(99,102,241,0.55);
+    border-radius: 14px;
+    color: var(--text);
+    padding: 16px 16px 16px 44px;
     font-size: 1.13rem;
     font-family: 'Cairo', system-ui, Arial, sans-serif;
-    box-shadow: 0 4px 32px #00e0b822, 0 1.5px 8px 0 #00e0b822;
-    transition: border 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 36px rgba(2,6,23,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+    transition: border 0.2s, box-shadow 0.2s, transform 0.06s;
     outline: none;
 }
 #raw:focus {
-    border: 2.5px solid #ffb300;
-    box-shadow: 0 6px 32px #ffb30055, 0 2px 12px #00e0b855;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--ring);
 }
 .arrange-btn {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 18px 6px 14px;
-    font-size: 1.01rem;
+    padding: 7px 16px 7px 14px;
+    font-size: 1rem;
     font-weight: 800;
-    background: linear-gradient(90deg,#00e0b8 0%,#ffb300 100%);
-    color: #232526;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    color: #fff;
     border: none;
     border-radius: 22px;
-    box-shadow: 0 2px 12px #00e0b822, 0 1.5px 8px 0 #ffb30022;
+    box-shadow: 0 6px 26px rgba(99,102,241,0.25);
     cursor: pointer;
     transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
     position: relative;
@@ -417,19 +304,19 @@ FBS11FAT7PORT5ah	FBS0011	FBS0011-7</textarea>
     z-index: 2;
 }
 .arrange-btn:hover, .arrange-btn:focus {
-    background: linear-gradient(90deg,#ffb300 0%,#00e0b8 100%);
+    background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%);
     color: #fff;
-    box-shadow: 0 8px 32px #ffb30077, 0 2px 12px #00e0b855;
-    transform: translateY(-2px) scale(1.08);
+    box-shadow: 0 10px 32px rgba(99,102,241,0.35);
+    transform: translateY(-2px) scale(1.05);
 }
 .arrange-btn-icon {
     font-size: 1.25em;
-    filter: drop-shadow(0 2px 8px #00e0b8aa);
+    filter: drop-shadow(0 2px 8px rgba(16,185,129,0.55));
     margin-left: 2px;
     transition: filter 0.2s;
 }
 .arrange-btn:hover .arrange-btn-icon, .arrange-btn:focus .arrange-btn-icon {
-    filter: drop-shadow(0 2px 8px #ffb300aa);
+    filter: drop-shadow(0 2px 8px rgba(99,102,241,0.65));
 }
 .arrange-btn-text {
     font-family: inherit;
@@ -447,87 +334,82 @@ FBS11FAT7PORT5ah	FBS0011	FBS0011-7</textarea>
 document.getElementById('arrangeColumnsBtn').addEventListener('click', function(){
     const textarea = document.getElementById('raw');
     let text = textarea.value;
-    if(!text.trim()) return;
-    // إذا كان النص عبارة عن عدة أسطر وكل سطر فيه تاب (أي لصق مباشر من Excel)
-    const lines = text.split(/\n/);
-    const excelLike = lines.length > 1 && lines.every(line => line.split('\t').length >= 2);
-    if(excelLike) {
-        // لا تغيّر شيئاً، فقط أعد تجميع الأسطر كما هي
-        textarea.value = lines.join('\n');
-        return;
-    }
-    // معالجة خاصّة: إذا كان النص يحتوي على أعمدة Excel مفصولة بتاب وبعض الخلايا فيها أسطر جديدة (حالة الأعمدة العمودية)
-    if(/\t/.test(text) && /\n/.test(text)){
-        let columns = text.split(/\t/);
-        if(columns.length >= 2){
-            let colArrays = columns.map(col => col.replace(/^"|"$/g, '').split(/\n/));
-            let maxLen = Math.max(...colArrays.map(arr => arr.length));
-            let arranged = [];
-            for(let i=0; i<maxLen; i++){
-                let row = colArrays.map(arr => (i < arr.length ? arr[i] : ''));
-                while(row.length < columns.length) row.push('');
-                arranged.push(row.join('\t'));
+    if (!text.trim()) return;
+    const lines = text.replace(/\r/g, '').split(/\n/);
+    const rows = [];
+    let buffer = [];
+    const pushBufferIfAny = () => {
+        if (buffer.length > 0) {
+            while (buffer.length < 3) buffer.push('');
+            rows.push([buffer[0]||'', buffer[1]||'', buffer[2]||''].join('\t'));
+            buffer = [];
+        }
+    };
+    for (let rawLine of lines) {
+        const line = (rawLine || '').replace(/\u00A0/g,' ').trim();
+        if (line === '') continue;
+        // 1) صف تبويبي كامل
+        if (rawLine.includes('\t')) {
+            const parts = rawLine.split('\t'); // يحافظ على الخلايا الفارغة
+            const trimmed = parts.map(p => (p ?? '').trim());
+            const nonEmpty = trimmed.filter(p => p.length > 0);
+            if (nonEmpty.length >= 2) {
+                // صف تبويبي كامل
+                pushBufferIfAny();
+                const c0 = (parts[0] ?? '').trim();
+                let c1 = (parts[1] ?? '').trim();
+                let c2 = (parts.length >= 3 ? parts[parts.length - 1] : '').trim();
+                // إضافة أصفار للزون (العمودين 2 و3)
+                c1 = addZeros(c1);
+                c2 = addZeros(c2);
+                rows.push([c0, c1, c2].join('\t'));
+            } else if (nonEmpty.length === 1) {
+                // عنصر رأسي مفرد (مثل \tVALUE) -> أضفه للتجميع الرأسي
+                buffer.push(nonEmpty[0]);
             }
-            textarea.value = arranged.join('\n');
-            return;
+            continue;
+        }
+        // 2) صف أفقي مفصول بمسافات (3 أعمدة أو أكثر)
+        const wsTokens = line.split(/\s+/);
+        if (wsTokens.length >= 3) {
+            // فلش أي تجميعة رأسية سابقة
+            pushBufferIfAny();
+            const c0 = wsTokens[0] || '';
+            let c1 = wsTokens[1] || '';
+            let c2 = wsTokens[wsTokens.length - 1] || '';
+            // إضافة أصفار للزون (العمودين 2 و3)
+            c1 = addZeros(c1);
+            c2 = addZeros(c2);
+            rows.push([c0, c1, c2].join('\t'));
+            continue;
+        }
+        // 3) تجميع رأسي: كل ثلاثة أسطر تشكل صفاً
+        buffer.push(line);
+        if (buffer.length === 3) {
+            // إضافة أصفار للزون عند اكتمال الصف الرأسي
+            const b0 = buffer[0]||'';
+            const b1 = addZeros(buffer[1]||'');
+            const b2 = addZeros(buffer[2]||'');
+            rows.push([b0, b1, b2].join('\t'));
+            buffer = [];
         }
     }
-    // ...باقي الكود القديم...
-    text = text.replace(/[ \t]+/g, ' ').replace(/\r/g, '').replace(/\n{2,}/g, '\n');
-    let rawLines = text.split(/\n/).map(sanitizeToken).filter(Boolean);
-    const zonePattern = /([A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?)/g;
-    rawLines = rawLines.map(line => {
-        const tokens = line.split(/\s+/).filter(Boolean);
-        if(tokens.length === 2 && /([A-Za-z\u0621-\u064A]{3}\d{3,4}(?:-[0-9A-Za-z]+)?){2,}/.test(tokens[1])){
-            const zones = tokens[1].match(zonePattern);
-            if(zones && zones.length === 2){
-                return tokens[0] + '\t' + zones[0] + '\t' + zones[1];
-            }
-        }
-        return line;
-    });
-    const horizontalCount = rawLines.filter(l => l.split(/\s+/).filter(Boolean).length >= 3).length;
-    const singleColCount = rawLines.filter(l => l.split(/\s+/).filter(Boolean).length === 1).length;
-    if(horizontalCount >= rawLines.length * 0.7 && rawLines.length >= 3){
-        textarea.value = rawLines.join('\n');
-        return;
+    // إذا تبقى تجميع رأسي غير مكتمل
+    if (buffer.length > 0) {
+        while (buffer.length < 3) buffer.push('');
+        const b0 = buffer[0]||'';
+        const b1 = addZeros(buffer[1]||'');
+        const b2 = addZeros(buffer[2]||'');
+        rows.push([b0, b1, b2].join('\t'));
     }
-    if(singleColCount >= rawLines.length * 0.7 && rawLines.length >= 3){
-        let arranged = [];
-        for(let i=0; i<rawLines.length; i+=3){
-            const group = rawLines.slice(i, i+3);
-            if(group.length === 3){
-                arranged.push(group.join('\t'));
-            } else {
-                arranged = arranged.concat(group);
-            }
-        }
-        textarea.value = arranged.join('\n');
-        return;
-    }
-    textarea.value = rawLines.join('\n');
+    textarea.value = rows.join('\n');
+    return;
 });
 </script>
-    <div class="buttons-wrapper">
-    <button id="togglePreviewOld">Preview EXCEL Transfer NEW</button>
-        <!-- Popup for Created by -->
-        <div id="createdByPopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(30,41,59,0.55);z-index:1000;align-items:center;justify-content:center;">
-            <div style="background:#1e293b;padding:32px 24px 24px 24px;border-radius:16px;box-shadow:0 4px 32px #38bdf855;max-width:90vw;width:350px;text-align:center;">
-                <h3 style="color:#38bdf8;margin-bottom:18px;font-size:1.3rem;">Assign <span style="color:#0ea5e9">Created by</span></h3>
-                <input id="createdByInput" type="text" placeholder="Enter name here" style="width:90%;padding:10px 8px;border-radius:8px;border:1.5px solid #334155;background:#232931;color:#e3e8ee;font-size:1rem;margin-bottom:18px;" value="ss">
-                <div>
-                    <button id="createdByOkBtn" style="margin-left:8px;">OK</button>
-                    <button id="createdByCancelBtn" style="background:#64748b;">Cancel</button>
-                </div>
-            </div>
-        </div>
-    <button id="exportExcelOld">Download Excel</button>
-    <button id="changeCreatedByOld">Change Created by Assign</button>
-    </div>
-    <div id="tblWrapOld" style="display:none;"></div>
     <div class="separator"></div>
     <!-- النظام الجديد -->
-    <label for="excelFile" style="font-weight:600; color:#00d2ff;display:block;text-align:center;">ALL users Excel:</label>
+    <section class="card">
+    <label for="excelFile" class="section-title" style="display:block;">ALL users Excel:</label>
     <div class="excel-upload-wrapper">
         <label for="excelFile" class="excel-upload-label">
             <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 8.36 4 5.33 6.59 4.65 10.04 2.76 10.36 1.25 12.03 1.25 14c0 2.21 1.79 4 4 4h13.5c2.21 0 4-1.79 4-4 0-1.97-1.51-3.64-3.4-3.96zM12 19c-1.1 0-2-.9-2-2h4c0 1.1-.9 2-2 2zm-1-7V8h2v4h3l-4 4-4-4h3z"></path></svg>
@@ -553,6 +435,7 @@ document.getElementById('arrangeColumnsBtn').addEventListener('click', function(
     <button id="exportExcelNew">Download Excel</button>
     </div>
     <div id="tblWrapNew" style="display:none;"></div>
+    </section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -840,14 +723,33 @@ function buildZoneMapping(data){
     const uniqueZones = [...new Set(data.map(d => d.zone))];
     let html = '<table><thead><tr><th>Zone القديم</th><th>Zone الجديد</th></tr></thead><tbody>';
     uniqueZones.forEach(z=>{
-        const newZone = ""; // دائماً فارغ ليكتب المستخدم الزون الجديد
+        const newZone = "";
         html += `<tr>
                     <td>${z}</td>
-                    <td><input class="zone-new" type="text" value="${newZone}"></td>
+                    <td><input class="zone-new" type="text" value="${newZone}" data-oldzone="${z}"></td>
                  </tr>`;
     });
     html += '</tbody></table>';
     document.getElementById('zoneMapping').innerHTML = html;
+
+    // إضافة منطق الإكمال التلقائي عند إدخال رقم فقط
+    setTimeout(() => {
+        document.querySelectorAll('.zone-new').forEach(input => {
+            input.addEventListener('input', function() {
+                const val = this.value.trim();
+                const oldZone = this.getAttribute('data-oldzone') || '';
+                const base = oldZone.split('-')[0];
+                // إذا أدخل المستخدم رقم فقط أو رقم مع -
+                if(/^(-?\d+)$/.test(val)) {
+                    this.value = base + '-' + val.replace(/^-/,'');
+                } else if(val === base) {
+                    // إذا أدخل المستخدم الأساس فقط (بدون -)
+                    this.value = base;
+                }
+                // إذا أدخل المستخدم الزون القديم كامل (مع -رقم) أو أي قيمة أخرى، لا تغيّر
+            });
+        });
+    }, 100);
 }
 
 // تطبيق التغييرات على جميع Device Username
