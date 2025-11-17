@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ar"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Users Transfer</title>
+<link href="Users%20Transfer_files/css2.css" rel="stylesheet">
+<style>
+/* Theme variables (Light White/Blue) */
+:root {
+    --bg-start: #ffffff;          /* page base */
+    --bg-end: #f0f6ff;            /* subtle blue tint */
+    --surface: #ffffff;           /* card surface */
+    --surface-2: #f8fbff;         /* inputs surface */
+    --text: #0f172a;              /* dark text */
+    --muted: #64748b;             /* muted text */
+    --primary: #1d4ed8;           /* blue-700 */
+    --primary-2: #3b82f6;         /* blue-500 */
+    --accent: #2563eb;            /* blue-600 */
+    --danger: #dc2626;            /* red-600 */
+    --ring: rgba(59,130,246,0.35);/* focus ring */
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Cairo', system-ui, Arial, sans-serif;
+    direction: rtl;
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    color: var(--text);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 16px 40px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 22px;
+}
+
+h2 {
+  text-align: center;
+  margin: 10px 0 4px 0;
+  color: var(--primary);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
+}
+
+.section-title {
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 1.08rem;
+  text-align: center;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid #dbeafe; /* light blue border */
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(30,58,138,0.10);
+    padding: 18px 14px 20px 14px;
+}
+
+textarea, input[type="file"], input[type="text"] {
+    width: 100%;
+    margin-bottom: 14px;
+    background: var(--surface-2);
+    border: 1.5px solid #cfe0ff;
+    border-radius: 12px;
+    color: var(--text);
+    padding: 12px 14px;
+    font-size: 1.02rem;
+    transition: border 0.18s, box-shadow 0.18s, background 0.18s;
+}
+
+textarea:focus, input[type="file"]:focus, input[type="text"]:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.excel-upload-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.excel-upload-input { display: none; }
+.excel-upload-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 14px;
+    font-size: 1.06rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(59,130,246,0.35);
+    min-width: 230px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.excel-upload-label:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(29,78,216,0.35); }
+.excel-upload-label svg { width: 28px; height: 28px; fill: #fff; }
+
+button {
+    padding: 11px 22px;
+    margin: 6px 4px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.18s ease;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%);
+    color: #fff;
+    border: 0;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 18px rgba(59,130,246,0.35);
+}
+button:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 26px rgba(29,78,216,0.35); }
+button:active { transform: translateY(0) scale(0.99); }
+
+.buttons-wrapper { text-align: center; margin: 10px 0 6px 0; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px auto 0 auto;
+    background: #ffffff;
+    border: 1px solid #dbeafe;
+    box-shadow: 0 2px 12px rgba(30,64,175,0.12);
+    border-radius: 14px;
+    overflow: hidden;
+}
+th, td {
+    border-top: 1px solid #e2e8f0;
+    border-left: 1px solid #f1f5f9;
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 0.95rem;
+}
+thead th {
+    background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%);
+    color: #ffffff;
+}
+tbody td { color: #0f172a; }
+.row-error td { background: #fee2e2; color: #991b1b; }
+
+input[type="text"].zone-new {
+    padding: 9px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1.5px solid #cfe0ff;
+    color: var(--text);
+}
+
+.separator { height: 3px; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%); opacity: 0.85; border-radius: 2px; margin: 24px 0; }
+
+@media (max-width: 900px) {
+    .container { padding: 18px 10px 26px 10px; }
+    h2 { font-size: 1.35rem; }
+    button { padding: 10px 14px; font-size: 0.98rem; }
+    th, td { font-size: 0.9rem; padding: 9px 6px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Popup for assign name before applying new zones -->
+    <div id="assignNamePopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2,6,23,0.60);z-index:1001;align-items:center;justify-content:center;">
+        <div style="background:var(--surface);padding:26px 22px 20px 22px;border-radius:16px;box-shadow:0 12px 44px rgba(99,102,241,0.28);max-width:90vw;width:360px;text-align:center;border:1px solid rgba(148,163,184,0.16);">
+            <h3 style="color:var(--primary);margin-bottom:16px;font-size:1.15rem;">Please enter the assign name</h3>
+            <input id="assignNameInput" type="text" placeholder="Enter assign name here" style="width:92%;padding:10px 10px;border-radius:10px;border:1.5px solid rgba(148,163,184,0.22);background:var(--surface-2);color:var(--text);font-size:1rem;margin-bottom:16px;outline:none;">
+            <div>
+                <button id="assignNameOkBtn" style="margin-left:8px;">OK</button>
+                <button id="assignNameCancelBtn" style="background:#475569;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- Popup for new zone confirmation -->
+    <div id="zoneConfirmPopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2,6,23,0.60);z-index:1000;align-items:center;justify-content:center;">
+        <div style="background:var(--surface);padding:26px 22px 20px 22px;border-radius:16px;box-shadow:0 12px 44px rgba(99,102,241,0.28);max-width:90vw;width:360px;text-align:center;border:1px solid rgba(148,163,184,0.16);">
+            <h3 style="color:var(--primary);margin-bottom:16px;font-size:1.15rem;">Are you sure about the new zone?</h3>
+            <div>
+                <button id="zoneConfirmYes" style="margin-left:8px;">Yes</button>
+                <button id="zoneConfirmNo" style="background:#475569;">No</button>
+            </div>
+        </div>
+    </div>
+    <h2>Users Transfer</h2>
+    <!-- النظام القديم -->
+    <section class="card">
+        <label for="raw" class="section-title">Users Transfer:</label>
+        <div class="raw-wrap">
+            <div class="arrange-btn-bar">
+                <button id="arrangeColumnsBtn" class="arrange-btn" title="ترتيب الأعمدة تلقائياً">
+                    <span class="arrange-btn-icon">🔄</span>
+                    <span class="arrange-btn-text">ترتيب الأعمدة</span>
+                </button>
+            </div>
+            <textarea id="raw" placeholder="ألصق هنا بياناتك (3 أعمدة: عقد، زون قديم، زون جديد)" cols="96" rows="16">FBS11FAT7PORT3ah	FBS0011	FBS0011-7
+FBS11FAT16PORT2	FBS0011	FBS0011-7
+FBS11FAT6PORT6ah	FBS0011	FBS0011-7
+FBS11FAT18PORT14ah	FBS0011	FBS0011-7
+FBS11FAT7PORT4ah	FBS0011	FBS0011-7
+FAT11-11-3	FBS0011	FBS0011-7
+FBS11FAT5PORT3ah	FBS0011	FBS0011-7
+FBS11FAT29PORT9ah	FBS0011	FBS0011-7
+FBS11FAT14PORT10ah	FBS0011	FBS0011-7
+FAT11-11-1	FBS0011	FBS0011-7
+FBS11FAT7PORT2ah	FBS0011	FBS0011-7
+FBS11FAT18PORT15ah	FBS0011	FBS0011-7
+FBS11FAT7PORT5ah	FBS0011	FBS0011-7</textarea>
+        </div>
+        <div class="buttons-wrapper">
+            <button id="togglePreviewOld">Preview EXCEL Transfer NEW</button>
+            <!-- Popup for Created by -->
+            <div id="createdByPopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2,6,23,0.60);z-index:1000;align-items:center;justify-content:center;">
+                <div style="background:var(--surface);padding:26px 22px 20px 22px;border-radius:16px;box-shadow:0 12px 44px rgba(99,102,241,0.28);max-width:90vw;width:360px;text-align:center;border:1px solid rgba(148,163,184,0.16);">
+                    <h3 style="color:var(--primary);margin-bottom:16px;font-size:1.2rem;">Assign <span style="color:var(--primary-2)">Created by</span></h3>
+                    <input id="createdByInput" type="text" placeholder="Enter name here" style="width:92%;padding:10px 10px;border-radius:10px;border:1.5px solid rgba(148,163,184,0.22);background:var(--surface-2);color:var(--text);font-size:1rem;margin-bottom:16px;" value="ss">
+                    <div>
+                        <button id="createdByOkBtn" style="margin-left:8px;">OK</button>
+                        <button id="createdByCancelBtn" style="background:#475569;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <button id="exportExcelOld">Download Excel</button>
+            <button id="changeCreatedByOld">Change Created by Assign</button>
+        </div>
+        <div id="tblWrapOld" style="display:none;"></div>
+    </section>
+<style>
+.raw-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 24px auto 24px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.arrange-btn-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+#raw {
+    resize: both !important;
+    min-width: 320px !important;
+    min-height: 120px !important;
+    max-width: 100% !important;
+    max-height: 60vh !important;
+    width: 100%;
+    height: 240px;
+    box-sizing: border-box;
+    margin: 0;
+    display: block;
+    background: linear-gradient(135deg,#ffffff 0%,#f0f6ff 100%); /* Light theme background */
+    border: 2px solid #3b82f6; /* Blue border */
+    border-radius: 14px;
+    color: #0f172a;
+    padding: 16px 16px 16px 44px;
+    font-size: 1.08rem;
+    font-family: 'Cairo', system-ui, Arial, sans-serif;
+    box-shadow: 0 4px 18px rgba(59,130,246,0.20), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: border 0.2s, box-shadow 0.2s, background 0.2s, transform 0.06s;
+    outline: none;
+}
+#raw:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--ring);
+}
+.arrange-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px 7px 14px;
+    font-size: 1rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    color: #fff;
+    border: none;
+    border-radius: 22px;
+    box-shadow: 0 6px 26px rgba(99,102,241,0.25);
+    cursor: pointer;
+    transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+    position: relative;
+    margin: 0 auto 0 auto;
+    outline: none;
+    min-width: 90px;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+.arrange-btn:hover, .arrange-btn:focus {
+    background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%);
+    color: #fff;
+    box-shadow: 0 10px 32px rgba(99,102,241,0.35);
+    transform: translateY(-2px) scale(1.05);
+}
+.arrange-btn-icon {
+    font-size: 1.25em;
+    filter: drop-shadow(0 2px 8px rgba(16,185,129,0.55));
+    margin-left: 2px;
+    transition: filter 0.2s;
+}
+.arrange-btn:hover .arrange-btn-icon, .arrange-btn:focus .arrange-btn-icon {
+    filter: drop-shadow(0 2px 8px rgba(99,102,241,0.65));
+}
+.arrange-btn-text {
+    font-family: inherit;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    font-size: 1.01em;
+}
+@media (max-width: 700px) {
+    .raw-wrap { max-width: 99vw; gap: 4px; }
+    #raw { font-size: 0.98rem; padding: 12px 12px 12px 36px; }
+    .arrange-btn { font-size: 0.93rem; padding: 6px 10px 6px 8px; min-width: 70px; }
+}
+</style>
+<script>
+document.getElementById('arrangeColumnsBtn').addEventListener('click', function(){
+    const textarea = document.getElementById('raw');
+    let text = textarea.value;
+    if (!text.trim()) return;
+    const lines = text.replace(/\r/g, '').split(/\n/);
+    const rows = [];
+    let buffer = [];
+    const pushBufferIfAny = () => {
+        if (buffer.length > 0) {
+            while (buffer.length < 3) buffer.push('');
+            rows.push([buffer[0]||'', buffer[1]||'', buffer[2]||''].join('\t'));
+            buffer = [];
+        }
+    };
+    for (let rawLine of lines) {
+        const line = (rawLine || '').replace(/\u00A0/g,' ').trim();
+        if (line === '') continue;
+        // 1) صف تبويبي كامل
+        if (rawLine.includes('\t')) {
+            const parts = rawLine.split('\t'); // يحافظ على الخلايا الفارغة
+            const trimmed = parts.map(p => (p ?? '').trim());
+            const nonEmpty = trimmed.filter(p => p.length > 0);
+            if (nonEmpty.length >= 2) {
+                // صف تبويبي كامل
+                pushBufferIfAny();
+                const c0 = (parts[0] ?? '').trim();
+                let c1 = (parts[1] ?? '').trim();
+                let c2 = (parts.length >= 3 ? parts[parts.length - 1] : '').trim();
+                // إضافة أصفار للزون (العمودين 2 و3)
+                c1 = addZeros(c1);
+                c2 = addZeros(c2);
+                rows.push([c0, c1, c2].join('\t'));
+            } else if (nonEmpty.length === 1) {
+                // عنصر رأسي مفرد (مثل \tVALUE) -> أضفه للتجميع الرأسي
+                buffer.push(nonEmpty[0]);
+            }
+            continue;
+        }
+        // 2) صف أفقي مفصول بمسافات (3 أعمدة أو أكثر)
+        const wsTokens = line.split(/\s+/);
+        if (wsTokens.length >= 3) {
+            // فلش أي تجميعة رأسية سابقة
+            pushBufferIfAny();
+            const c0 = wsTokens[0] || '';
+            let c1 = wsTokens[1] || '';
+            let c2 = wsTokens[wsTokens.length - 1] || '';
+            // إضافة أصفار للزون (العمودين 2 و3)
+            c1 = addZeros(c1);
+            c2 = addZeros(c2);
+            rows.push([c0, c1, c2].join('\t'));
+            continue;
+        }
+        // 3) تجميع رأسي: كل ثلاثة أسطر تشكل صفاً
+        buffer.push(line);
+        if (buffer.length === 3) {
+            // إضافة أصفار للزون عند اكتمال الصف الرأسي
+            const b0 = buffer[0]||'';
+            const b1 = addZeros(buffer[1]||'');
+            const b2 = addZeros(buffer[2]||'');
+            rows.push([b0, b1, b2].join('\t'));
+            buffer = [];
+        }
+    }
+    // إذا تبقى تجميع رأسي غير مكتمل
+    if (buffer.length > 0) {
+        while (buffer.length < 3) buffer.push('');
+        const b0 = buffer[0]||'';
+        const b1 = addZeros(buffer[1]||'');
+        const b2 = addZeros(buffer[2]||'');
+        rows.push([b0, b1, b2].join('\t'));
+    }
+    textarea.value = rows.join('\n');
+    return;
+});
+</script>
+    <div class="separator"></div>
+    <!-- النظام الجديد -->
+    <section class="card">
+    <label for="excelFile" class="section-title" style="display:block;">ALL users Excel:</label>
+    <div class="excel-upload-wrapper">
+        <label for="excelFile" class="excel-upload-label">
+            <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 8.36 4 5.33 6.59 4.65 10.04 2.76 10.36 1.25 12.03 1.25 14c0 2.21 1.79 4 4 4h13.5c2.21 0 4-1.79 4-4 0-1.97-1.51-3.64-3.4-3.96zM12 19c-1.1 0-2-.9-2-2h4c0 1.1-.9 2-2 2zm-1-7V8h2v4h3l-4 4-4-4h3z"></path></svg>
+            Upload Excel File
+        </label>
+        <input type="file" id="excelFile" class="excel-upload-input" accept=".xlsx,.xls">
+        <div id="excelUploadedMsg" style="display:none;margin-top:8px;color:#22c55e;font-weight:700;font-size:1.05rem;text-align:center;">
+            <svg style="vertical-align:middle;width:20px;height:20px;fill:#22c55e;margin-left:6px;" viewBox="0 0 24 24"><path d="M9 16.2l-3.5-3.5 1.4-1.4L9 13.4l7.1-7.1 1.4 1.4z"></path></svg>
+            Excel file uploaded successfully
+        </div>
+    </div>
+    <div class="buttons-wrapper">
+    <button id="loadExcel">New Zone Transfer</button>
+    </div>
+    <div id="zoneMapping"></div>
+    <div class="buttons-wrapper">
+    <button id="applyZones">Apply New Zones</button>
+    </div>
+    <div class="separator"></div>
+    <div class="buttons-wrapper">
+    <button id="togglePreviewNew">Preview Final Table</button>
+    <button id="changeCreatedByNew">Change Created by Assign</button>
+    <button id="exportExcelNew">Download Excel</button>
+    </div>
+    <div id="tblWrapNew" style="display:none;"></div>
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+// Show confirmation when Excel file is uploaded
+const excelInput = document.getElementById('excelFile');
+const excelUploadedMsg = document.getElementById('excelUploadedMsg');
+excelInput.addEventListener('change', function() {
+    if (this.files && this.files.length > 0) {
+        excelUploadedMsg.style.display = 'block';
+    } else {
+        excelUploadedMsg.style.display = 'none';
+    }
+});
+
+// =================== النظام القديم ===================
+let previewVisibleOld = false;
+let createdByOld = 'غير مخصص';
+
+function cleanZeros(token){
+    return token ? token.replace(/([A-Za-z\u0621-\u064A]+)0+(\d+)/g, '$1$2') : token;
+}
+
+function addZeros(zone) {
+    // يجعل الزون 3 أحرف و4 أرقام (FBG12 → FBG0012)
+    if (!zone) return zone;
+    // يلتقط 3 أحرف متبوعة بأي أرقام أو باقي النص
+    const match = zone.match(/^([A-Za-z\u0621-\u064A]{3})(\d{1,4})(.*)$/);
+    if (match) {
+        const prefix = match[1];
+        const numbers = match[2].padStart(4, '0');
+        const rest = match[3] || '';
+        return prefix + numbers + rest;
+    }
+    return zone;
+}
+
+// إزالة المحارف الخفية (مسافات غير منقطعة / علامات اتجاه) وتوحيد المسافات
+function sanitizeToken(str){
+    if(!str) return '';
+    return str
+        .replace(/\u00A0/g,' ')              // nbsp -> space
+        .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'') // علامات اتجاه
+        .trim();
+}
+
+function parseLinesOld(text, createdBy){
+    let errorUsers = [];
+    let missingUsers = [];
+    const rawLines = text.split(/\r?\n/).map(sanitizeToken).filter(Boolean);
+    const rows = [];
+    let buffer = [];
+    for(let i=0; i<rawLines.length; i++){
+        const line = rawLines[i];
+        // استخدم التاب للفصل أولاً إذا موجود، وإلا المسافة
+        const tokens = line.includes('\t') ? line.split('\t') : line.split(/\s+/);
+        // إذا كان هناك نقص في أي حقل
+        if(tokens.length === 3 && (tokens[0].trim() === '' || tokens[1].trim() === '' || tokens[2].trim() === '')){
+            rows.push({ contract: tokens[0]||'', zone: tokens[1]||'', fdt: tokens[2]||'', createdBy, error: true, missing: true });
+            missingUsers.push('صف به نقص: ' + (tokens[0]||'') + ' | ' + (tokens[1]||'') + ' | ' + (tokens[2]||''));
+            continue;
+        }
+        if(tokens.length === 1){
+            buffer.push(tokens[0]);
+            if(buffer.length === 3){
+                const [contract, zoneOldRaw, zoneNewRaw] = buffer;
+                const zoneOld = addZeros(zoneOldRaw);
+                const zoneOriginalToken = zoneNewRaw;
+                const zone = addZeros(zoneOriginalToken);
+                const fdt = cleanZeros(zoneOriginalToken);
+                let error = false;
+                if(zoneOld && zone) {
+                    let z1 = zone.trim().toUpperCase();
+                    let z2 = zoneOld.trim().toUpperCase();
+                    const base1 = z1.replace(/-\d+$/, '');
+                    const base2 = z2.replace(/-\d+$/, '');
+                    if(!(z1.includes(z2) || z2.includes(z1) || base1 === base2)) {
+                        error = true;
+                        errorUsers.push(contract + ' ('+ z2 + ' → ' + z1 +')');
+                    }
+                }
+                rows.push({ contract, zone, fdt, createdBy, error });
+                buffer = [];
+            }
+        } else if(tokens.length >= 3){
+            const contract = tokens[0];
+            const zoneOldRaw = tokens[1];
+            const zoneNewRaw = tokens[tokens.length - 1];
+            const zoneOld = addZeros(zoneOldRaw);
+            const zoneOriginalToken = zoneNewRaw;
+            const zone = addZeros(zoneOriginalToken);
+            const fdt = cleanZeros(zoneOriginalToken);
+            let error = false;
+            if(zoneOld && zone) {
+                let z1 = zone.trim().toUpperCase();
+                let z2 = zoneOld.trim().toUpperCase();
+                const base1 = z1.replace(/-\d+$/, '');
+                const base2 = z2.replace(/-\d+$/, '');
+                if(base1 !== base2) {
+                    error = true;
+                    errorUsers.push(contract + ' ('+ z2 + ' → ' + z1 +')');
+                }
+            }
+            rows.push({ contract, zone, fdt, createdBy, error });
+            buffer = [];
+        }
+    }
+    // أظهر تنبيه إذا كان هناك صفوف ناقصة
+    if(missingUsers.length > 0) {
+        showErrorPopup(missingUsers);
+    } else if(errorUsers.length > 0) {
+        showErrorPopup(errorUsers);
+    }
+    return rows;
+}
+
+// نافذة منبثقة لعرض اليوزريات التي بها مشكلة
+function showErrorPopup(users) {
+    let popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    popup.style.top = '0';
+    popup.style.left = '0';
+    popup.style.width = '100vw';
+    popup.style.height = '100vh';
+    popup.style.background = 'rgba(30,41,59,0.7)';
+    popup.style.zIndex = '2000';
+    popup.style.display = 'flex';
+    popup.style.alignItems = 'center';
+    popup.style.justifyContent = 'center';
+    popup.innerHTML = `<div style="background:#1e293b;padding:32px 24px 24px 24px;border-radius:16px;box-shadow:0 4px 32px #38bdf855;max-width:90vw;width:400px;text-align:center;">
+        <h3 style='color:#f87171;margin-bottom:18px;font-size:1.2rem;'>لا يمكن نقل المستخدمين التالية أسماؤهم إلى زون مختلفة:</h3>
+        <div style='color:#fff;margin-bottom:18px;max-height:200px;overflow:auto;'>${users.map(u=>`<div>${u}</div>`).join('')}</div>
+        <button onclick='this.parentNode.parentNode.remove()' style='margin-top:8px;padding:7px 18px;border-radius:8px;background:#f87171;color:#fff;font-weight:700;border:none;cursor:pointer;'>إغلاق</button>
+    </div>`;
+    document.body.appendChild(popup);
+}
+
+function buildTableOld(rows){
+    if(rows.length === 0){
+        document.getElementById('tblWrapOld').innerHTML = '<p>لا توجد بيانات.</p>';
+        return;
+    }
+    let html = '<table id="mainTableOld"><thead><tr>' +
+               '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th><th>Status</th>' +
+           '</tr></thead><tbody>';
+    rows.forEach(r=>{
+        let statusIcon = '✔️';
+        let rowClass = '';
+        if(r.missing) {
+            statusIcon = '❌';
+            rowClass = ' class="row-error"';
+        } else if(r.error) {
+            statusIcon = '❌';
+            rowClass = ' class="row-error"';
+        }
+        html += `<tr${rowClass}>
+                      <td>${r.contract}</td>
+                      <td>${r.zone}</td>
+                      <td>${r.fdt}</td>
+                      <td><input type="text" value="${r.createdBy}"></td>
+                      <td>${statusIcon}${r.missing ? ' (نقص بيانات)' : ''}</td>
+                  </tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('tblWrapOld').innerHTML = html;
+}
+
+
+// Popup logic
+const popup = document.getElementById('createdByPopup');
+const createdByInput = document.getElementById('createdByInput');
+const okBtn = document.getElementById('createdByOkBtn');
+const cancelBtn = document.getElementById('createdByCancelBtn');
+
+document.getElementById('togglePreviewOld').addEventListener('click', function(){
+    const text = document.getElementById('raw').value.trim();
+    if(!previewVisibleOld){
+        if(!text){
+            alert('ألصق البيانات أولاً');
+            return;
+        }
+        if(!createdByOld || createdByOld === 'غير مخصص'){
+            popup.style.display = 'flex';
+            createdByInput.value = '';
+            createdByInput.focus();
+            // Handle OK
+            okBtn.onclick = function() {
+                let val = createdByInput.value.trim();
+                createdByOld = val === '' ? 'غير مخصص' : val;
+                popup.style.display = 'none';
+                const rows = parseLinesOld(text, createdByOld);
+                buildTableOld(rows);
+                document.getElementById('tblWrapOld').style.display = 'block';
+                document.getElementById('togglePreviewOld').textContent = 'Hide Preview';
+                previewVisibleOld = true;
+            };
+            // Handle Cancel
+            cancelBtn.onclick = function() {
+                popup.style.display = 'none';
+            };
+            return;
+        }
+        const rows = parseLinesOld(text, createdByOld);
+        buildTableOld(rows);
+        document.getElementById('tblWrapOld').style.display = 'block';
+        this.textContent = 'إخفاء المعاينة';
+        previewVisibleOld = true;
+    } else {
+        document.getElementById('tblWrapOld').style.display = 'none';
+    this.textContent = 'EXCEL Transfer NEW';
+        previewVisibleOld = false;
+    }
+});
+
+document.getElementById('changeCreatedByOld').addEventListener('click', function(){
+    const table = document.getElementById('mainTableOld');
+    if(!table){ alert('لا توجد بيانات لتغيير Created by!'); return; }
+    const newName = prompt('اكتب الاسم الجديد لـ Created by:', '');
+    if(newName === null) return;
+    const finalName = newName.trim() === '' ? 'غير مخصص' : newName.trim();
+    table.querySelectorAll('tbody tr').forEach(tr=>{
+        const input = tr.querySelector('td:nth-child(4) input');
+        if(input) input.value = finalName;
+    });
+    createdByOld = finalName;
+});
+
+document.getElementById('exportExcelOld').addEventListener('click', function(){
+    const table = document.getElementById('mainTableOld');
+    if(!table){ alert('لا توجد بيانات للتحميل!'); return; }
+    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => {
+        const tds = tr.querySelectorAll('td');
+            // الأعمدة: 0 Contract, 1 Zone, 2 FDT, 3 Created by (input)
+            return [tds[0].textContent, tds[1].textContent, tds[2].textContent, tds[3].querySelector('input').value];
+    });
+    const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...rows]);
+    XLSX.utils.book_append_sheet(wb, ws, "Table");
+    XLSX.writeFile(wb, "OldData.xlsx");
+});
+
+// =================== النظام الجديد ===================
+let rawDataNew = [];
+let previewVisibleNew = false;
+let createdByNew = 'غير مخصص';
+
+// مصفوفة Zones مسبقة
+const predefinedZones = {
+  "FMS0464": "FMS0464-3",
+  "FMS0465": "FMS0465-3",
+  "FMS0466": "FMS0466-2",
+  "FMS0467": "FMS0467-2",
+  "FMS0468": "FMS0468-2",
+  "FMS0469": "FMS0469-3",
+  "FMS0470": "FMS0470-2"
+};
+
+// رفع Excel واستخراج Device Username و Zone
+document.getElementById('loadExcel').addEventListener('click', () => {
+    const fileInput = document.getElementById('excelFile');
+    if(fileInput.files.length === 0){ alert('اختر ملف Excel أولاً!'); return; }
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e){
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, {header:1});
+
+        const headers = jsonData[0].map(h=>h.toString().trim().toLowerCase());
+        const deviceIndex = headers.findIndex(h => h === 'device username');
+        const zoneIndex = headers.findIndex(h => h === 'zone');
+
+        if(deviceIndex === -1 || zoneIndex === -1){ alert('تأكد أن الملف يحتوي على Device Username و Zone'); return; }
+
+        rawDataNew = jsonData.slice(1).map(row => ({device: row[deviceIndex]||'', zone: row[zoneIndex]||''}));
+        buildZoneMapping(rawDataNew);
+    };
+    reader.readAsArrayBuffer(file);
+});
+
+// إنشاء جدول تعديل Zone مع القيم المسبقة
+function buildZoneMapping(data){
+    const uniqueZones = [...new Set(data.map(d => d.zone))];
+    let html = '<table><thead><tr><th>Zone القديم</th><th>Zone الجديد</th></tr></thead><tbody>';
+    uniqueZones.forEach(z=>{
+        const newZone = "";
+        html += `<tr>
+                    <td>${z}</td>
+                    <td><input class="zone-new" type="text" value="${newZone}" data-oldzone="${z}"></td>
+                 </tr>`;
+    });
+    html += '</tbody></table>';
+    document.getElementById('zoneMapping').innerHTML = html;
+
+    // إضافة منطق الإكمال التلقائي عند إدخال رقم فقط
+    setTimeout(() => {
+        document.querySelectorAll('.zone-new').forEach(input => {
+            input.addEventListener('input', function() {
+                const val = this.value.trim();
+                const oldZone = this.getAttribute('data-oldzone') || '';
+                const base = oldZone.split('-')[0];
+                // إذا أدخل المستخدم رقم فقط أو رقم مع -
+                if(/^(-?\d+)$/.test(val)) {
+                    this.value = base + '-' + val.replace(/^-/,'');
+                } else if(val === base) {
+                    // إذا أدخل المستخدم الأساس فقط (بدون -)
+                    this.value = base;
+                }
+                // إذا أدخل المستخدم الزون القديم كامل (مع -رقم) أو أي قيمة أخرى، لا تغيّر
+            });
+        });
+    }, 100);
+}
+
+// تطبيق التغييرات على جميع Device Username
+document.getElementById('applyZones').addEventListener('click', ()=>{
+    const table = document.querySelector('#zoneMapping table');
+    if(!table){ alert('لا توجد بيانات Zones لتطبيقها!'); return; }
+    // Show assign name popup first
+    const assignPopup = document.getElementById('assignNamePopup');
+    const assignInput = document.getElementById('assignNameInput');
+    assignPopup.style.display = 'flex';
+    assignInput.value = '';
+    assignInput.focus();
+    document.getElementById('assignNameOkBtn').onclick = function() {
+        const assignVal = assignInput.value.trim();
+        if(assignVal === '') { assignInput.focus(); return; }
+        assignPopup.style.display = 'none';
+        // Show confirmation popup after assign name
+        const zonePopup = document.getElementById('zoneConfirmPopup');
+        zonePopup.style.display = 'flex';
+        document.getElementById('zoneConfirmYes').onclick = function() {
+            const rows = table.querySelectorAll('tbody tr');
+            const zoneMap = {};
+            rows.forEach(tr=>{
+                const oldZone = tr.cells[0].textContent;
+                const newZone = tr.querySelector('input').value.trim();
+                if(newZone) zoneMap[oldZone] = newZone;
+            });
+            rawDataNew = rawDataNew.map(r=>({...r, zone: zoneMap[r.zone]||r.zone, assign: assignVal}));
+            createdByNew = assignVal; // اجعل createdByNew هو نفس assign
+            zonePopup.style.display = 'none';
+            alert('تم تطبيق الـ Zones الجديدة بنجاح!');
+        };
+        document.getElementById('zoneConfirmNo').onclick = function() {
+            zonePopup.style.display = 'none';
+        };
+    };
+    document.getElementById('assignNameCancelBtn').onclick = function() {
+        assignPopup.style.display = 'none';
+    };
+});
+
+// معاينة الجدول النهائي
+document.getElementById('togglePreviewNew').addEventListener('click', function(){
+    if(!previewVisibleNew){
+        if(rawDataNew.length === 0){ alert('لا توجد بيانات لعرضها!'); return; }
+        if(!createdByNew){
+            const inputName = prompt('اكتب اسم Created by:', '');
+            createdByNew = inputName===null||inputName.trim()===''?'غير مخصص':inputName.trim();
+        }
+        buildPreviewTableNew();
+        document.getElementById('tblWrapNew').style.display='block';
+        this.textContent='إخفاء المعاينة';
+        previewVisibleNew=true;
+    } else {
+        document.getElementById('tblWrapNew').style.display='none';
+        this.textContent='معاينة الجدول النهائي';
+        previewVisibleNew=false;
+    }
+});
+
+// بناء جدول Preview الجديد مع FDT من Zone الجديد
+function buildPreviewTableNew(){
+    const htmlRows = rawDataNew.map(r => {
+        const fdtValue = cleanZeros(r.zone); // FDT يعتمد على Zone الجديد
+        return `<tr>
+            <td>${r.device}</td>
+            <td>${r.zone}</td>
+            <td><input type="text" value="${fdtValue}"></td>
+            <td><input type="text" value="${createdByNew}"></td>
+        </tr>`;
+    }).join('');
+    const html = `<div style="display:flex;justify-content:center;width:100%;"><table id="mainTableNew"><thead>
+        <tr><th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th></tr>
+    </thead><tbody>${htmlRows}</tbody></table></div>`;
+    document.getElementById('tblWrapNew').innerHTML=html;
+}
+
+// تغيير Created by
+document.getElementById('changeCreatedByNew').addEventListener('click', ()=>{
+    const table=document.getElementById('mainTableNew');
+    if(!table){ alert('لا توجد بيانات لتغيير Created by!'); return; }
+    // Show assign popup
+    const assignPopup = document.getElementById('assignNamePopup');
+    const assignInput = document.getElementById('assignNameInput');
+    assignPopup.style.display = 'flex';
+    assignInput.value = '';
+    assignInput.focus();
+    document.getElementById('assignNameOkBtn').onclick = function() {
+        const assignVal = assignInput.value.trim();
+        if(assignVal === '') { assignInput.focus(); return; }
+        assignPopup.style.display = 'none';
+        table.querySelectorAll('tbody tr').forEach(tr=>{
+            const input = tr.querySelector('td:nth-child(4) input');
+            if(input) input.value = assignVal;
+        });
+        createdByNew = assignVal;
+    };
+    document.getElementById('assignNameCancelBtn').onclick = function() {
+        assignPopup.style.display = 'none';
+    };
+});
+
+// تصدير Excel النهائي
+document.getElementById('exportExcelNew').addEventListener('click', ()=>{
+    const table = document.getElementById('mainTableNew');
+    if(!table){ alert('لا توجد بيانات لتصديرها!'); return; }
+    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr=>{
+        const tds = tr.querySelectorAll('td');
+        return [
+            tds[0].textContent,
+            tds[1].textContent,
+            tds[2].querySelector('input').value,
+            tds[3].querySelector('input').value
+        ];
+    });
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...rows]);
+    XLSX.utils.book_append_sheet(wb, ws, "Table");
+    XLSX.writeFile(wb, "FinalData.xlsx");
+});
+</script>
+
+
+
+</body></html>
