@@ -541,17 +541,24 @@ function parseLinesOld(text, createdBy){
             buffer = [];
         }
     }
-    // أظهر تنبيه إذا كان هناك صفوف ناقصة
+    // كشف المكررات
+    const seen = new Set();
+    const dups = [];
+    rows.forEach(r => {
+        if(seen.has(r.contract)) dups.push(r.contract);
+        else seen.add(r.contract);
+    });
+    // أظهر تنبيه إذا كان هناك صفوف ناقصة أو زونات مختلفة أو مكررات
     if(missingUsers.length > 0) {
-        showErrorPopup(missingUsers);
-    } else if(errorUsers.length > 0) {
-        showErrorPopup(errorUsers);
+        showErrorPopup(missingUsers, dups);
+    } else if(errorUsers.length > 0 || dups.length > 0) {
+        showErrorPopup(errorUsers, dups);
     }
     return rows;
 }
 
 // نافذة منبثقة لعرض اليوزريات التي بها مشكلة
-function showErrorPopup(users) {
+function showErrorPopup(users, dups) {
     let popup = document.createElement('div');
     popup.style.position = 'fixed';
     popup.style.top = '0';
@@ -563,12 +570,71 @@ function showErrorPopup(users) {
     popup.style.display = 'flex';
     popup.style.alignItems = 'center';
     popup.style.justifyContent = 'center';
-    popup.innerHTML = `<div style="background:#1e293b;padding:32px 24px 24px 24px;border-radius:16px;box-shadow:0 4px 32px #38bdf855;max-width:90vw;width:400px;text-align:center;">
-        <h3 style='color:#f87171;margin-bottom:18px;font-size:1.2rem;'>لا يمكن نقل المستخدمين التالية أسماؤهم إلى زون مختلفة:</h3>
-        <div style='color:#fff;margin-bottom:18px;max-height:200px;overflow:auto;'>${users.map(u=>`<div>${u}</div>`).join('')}</div>
-        <button onclick='this.parentNode.parentNode.remove()' style='margin-top:8px;padding:7px 18px;border-radius:8px;background:#f87171;color:#fff;font-weight:700;border:none;cursor:pointer;'>إغلاق</button>
+    let html = `<div style="background:#1e293b;padding:32px 24px 24px 24px;border-radius:16px;box-shadow:0 4px 32px #38bdf855;max-width:90vw;width:400px;text-align:center;">`;
+    if(users && users.length > 0) {
+        html += `<h3 style='color:#f87171;margin-bottom:12px;font-size:1.1rem;'>لا يمكن نقل المستخدمين التالية أسماؤهم إلى زون مختلفة:</h3>`;
+        html += `<div style='color:#fff;margin-bottom:14px;max-height:120px;overflow:auto;'>${users.map(u=>`<div>${u}</div>`).join('')}</div>`;
+    }
+    if(dups && dups.length > 0) {
+        html += `<h3 style='color:#b45309;margin-bottom:10px;font-size:1.05rem;'>تم حذف السجلات المكررة (Contract)</h3>`;
+        html += `<div style='color:#fbbf24;margin-bottom:12px;max-height:90px;overflow:auto;text-align:right;direction:rtl;font-size:0.92rem;line-height:1.5;'>${dups.map(c=>`<div>• ${c}</div>`).join('')}</div>`;
+    }
+    html += `<button onclick='this.parentNode.parentNode.remove()' style='margin-top:8px;padding:7px 18px;border-radius:8px;background:#f87171;color:#fff;font-weight:700;border:none;cursor:pointer;'>إغلاق</button></div>`;
+    popup.innerHTML = html;
+    document.body.appendChild(popup);
+}
+
+// عرض نافذة للمكررات التي سيتم حذفها عند التصدير
+function showDuplicatesPopup(dups) {
+    if(!dups || dups.length === 0) return;
+    let popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    popup.style.top = '0';
+    popup.style.left = '0';
+    popup.style.width = '100vw';
+    popup.style.height = '100vh';
+    popup.style.background = 'rgba(0,0,0,0.35)';
+    popup.style.zIndex = '2600';
+    popup.style.display = 'flex';
+    popup.style.alignItems = 'center';
+    popup.style.justifyContent = 'center';
+    popup.innerHTML = `<div style="background:var(--surface);padding:26px 22px 20px 22px;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.30);max-width:90vw;width:440px;text-align:center;border:1px solid #dbeafe;">
+        <h3 style='color:var(--primary);margin-bottom:12px;font-size:1.05rem;'>تم حذف السجلات المكررة (Contract)</h3>
+        <div style='color:var(--text);margin-bottom:16px;max-height:240px;overflow:auto;text-align:right;direction:rtl;font-size:0.9rem;line-height:1.5;'>${dups.map(c=>`<div>• ${c}</div>`).join('')}</div>
+        <button onclick='this.parentNode.parentNode.remove()' style='padding:8px 18px;border-radius:10px;background:linear-gradient(90deg,var(--primary) 0%,var(--primary-2) 100%);color:#fff;font-weight:700;border:none;cursor:pointer;'>إغلاق</button>
     </div>`;
     document.body.appendChild(popup);
+}
+
+// استخراج صفوف فريدة حسب العقد وإرجاع المكررات المحذوفة
+function extractUniqueContracts(table, contractIdx, zoneIdx, fdtIdx, createdByIdx) {
+    const seen = new Set();
+    const duplicates = [];
+    const unique = [];
+    table.querySelectorAll('tbody tr').forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        const contract = (tds[contractIdx].textContent || '').trim();
+        if(seen.has(contract)) {
+            duplicates.push(contract);
+            return; // تجاهل المكرر
+        }
+        seen.add(contract);
+        const zone = zoneIdx !== null ? (tds[zoneIdx].textContent || '').trim() : '';
+        const fdtCell = fdtIdx !== null ? tds[fdtIdx] : null;
+        let fdt = '';
+        if(fdtCell){
+            const inEl = fdtCell.querySelector('input');
+            fdt = inEl ? inEl.value : fdtCell.textContent.trim();
+        }
+        const createdCell = createdByIdx !== null ? tds[createdByIdx] : null;
+        let createdBy = '';
+        if(createdCell){
+            const inEl2 = createdCell.querySelector('input');
+            createdBy = inEl2 ? inEl2.value : createdCell.textContent.trim();
+        }
+        unique.push([contract, zone, fdt, createdBy]);
+    });
+    return { unique, duplicates };
 }
 
 function buildTableOld(rows){
@@ -576,6 +642,13 @@ function buildTableOld(rows){
         document.getElementById('tblWrapOld').innerHTML = '<p>لا توجد بيانات.</p>';
         return;
     }
+    // كشف المكررات
+    const seen = new Set();
+    const dups = new Set();
+    rows.forEach(r => {
+        if(seen.has(r.contract)) dups.add(r.contract);
+        else seen.add(r.contract);
+    });
     let html = '<table id="mainTableOld"><thead><tr>' +
                '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th><th>Status</th>' +
            '</tr></thead><tbody>';
@@ -588,6 +661,8 @@ function buildTableOld(rows){
         } else if(r.error) {
             statusIcon = '❌';
             rowClass = ' class="row-error"';
+        } else if(dups.has(r.contract)) {
+            rowClass = ' class="row-duplicate"';
         }
         html += `<tr${rowClass}>
                       <td>${r.contract}</td>
@@ -600,6 +675,10 @@ function buildTableOld(rows){
     html += '</tbody></table>';
     document.getElementById('tblWrapOld').innerHTML = html;
 }
+
+// تمييز الصف المكرر (CSS)
+// أضف هذا في رأس الصفحة أو في style الرئيسي
+// .row-duplicate td { background: #fef08a !important; color: #b45309 !important; }
 
 
 // Popup logic
@@ -664,13 +743,10 @@ document.getElementById('changeCreatedByOld').addEventListener('click', function
 document.getElementById('exportExcelOld').addEventListener('click', function(){
     const table = document.getElementById('mainTableOld');
     if(!table){ alert('لا توجد بيانات للتحميل!'); return; }
-    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => {
-        const tds = tr.querySelectorAll('td');
-            // الأعمدة: 0 Contract, 1 Zone, 2 FDT, 3 Created by (input)
-            return [tds[0].textContent, tds[1].textContent, tds[2].textContent, tds[3].querySelector('input').value];
-    });
+    const { unique, duplicates } = extractUniqueContracts(table, 0, 1, 2, 3);
+    if(duplicates.length) { showDuplicatesPopup(duplicates); }
     const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...rows]);
+    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...unique]);
     XLSX.utils.book_append_sheet(wb, ws, "Table");
     XLSX.writeFile(wb, "OldData.xlsx");
 });
@@ -810,9 +886,17 @@ document.getElementById('togglePreviewNew').addEventListener('click', function()
 
 // بناء جدول Preview الجديد مع FDT من Zone الجديد
 function buildPreviewTableNew(){
+    // كشف المكررات
+    const seen = new Set();
+    const dups = new Set();
+    rawDataNew.forEach(r => {
+        if(seen.has(r.device)) dups.add(r.device);
+        else seen.add(r.device);
+    });
     const htmlRows = rawDataNew.map(r => {
         const fdtValue = cleanZeros(r.zone); // FDT يعتمد على Zone الجديد
-        return `<tr>
+        const rowClass = dups.has(r.device) ? ' class="row-duplicate"' : '';
+        return `<tr${rowClass}>
             <td>${r.device}</td>
             <td>${r.zone}</td>
             <td><input type="text" value="${fdtValue}"></td>
@@ -854,17 +938,10 @@ document.getElementById('changeCreatedByNew').addEventListener('click', ()=>{
 document.getElementById('exportExcelNew').addEventListener('click', ()=>{
     const table = document.getElementById('mainTableNew');
     if(!table){ alert('لا توجد بيانات لتصديرها!'); return; }
-    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr=>{
-        const tds = tr.querySelectorAll('td');
-        return [
-            tds[0].textContent,
-            tds[1].textContent,
-            tds[2].querySelector('input').value,
-            tds[3].querySelector('input').value
-        ];
-    });
+    const { unique, duplicates } = extractUniqueContracts(table, 0, 1, 2, 3);
+    if(duplicates.length) { showDuplicatesPopup(duplicates); }
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...rows]);
+    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...unique]);
     XLSX.utils.book_append_sheet(wb, ws, "Table");
     XLSX.writeFile(wb, "FinalData.xlsx");
 });
