@@ -6,32 +6,30 @@
 <title>Users Transfer</title>
 <link href="Users%20Transfer_files/css2.css" rel="stylesheet">
 <style>
-/* Theme variables */
+/* Theme variables (Light White/Blue) */
 :root {
-  --bg-start: #0f172a; /* slate-900 */
-  --bg-end: #111827;   /* gray-900 */
-  --surface: #0b1220;  /* deep surface */
-  --surface-2: #111827;/* surface variant */
-  --text: #e5e7eb;     /* text */
-  --muted: #64748b;    /* slate-500 */
-  --primary: #6366f1;  /* indigo-500 */
-  --primary-2: #22d3ee;/* cyan-400 */
-  --accent: #10b981;   /* emerald-500 */
-  --danger: #ef4444;   /* red-500 */
-  --ring: rgba(99, 102, 241, 0.35);
+    --bg-start: #ffffff;          /* page base */
+    --bg-end: #f0f6ff;            /* subtle blue tint */
+    --surface: #ffffff;           /* card surface */
+    --surface-2: #f8fbff;         /* inputs surface */
+    --text: #0f172a;              /* dark text */
+    --muted: #64748b;             /* muted text */
+    --primary: #1d4ed8;           /* blue-700 */
+    --primary-2: #3b82f6;         /* blue-500 */
+    --accent: #2563eb;            /* blue-600 */
+    --danger: #dc2626;            /* red-600 */
+    --ring: rgba(59,130,246,0.35);/* focus ring */
 }
 
 * { box-sizing: border-box; }
 
 body {
-  font-family: 'Cairo', system-ui, Arial, sans-serif;
-  direction: rtl;
-  margin: 0;
-  min-height: 100vh;
-  background: radial-gradient(1200px 600px at 50% -10%, rgba(99,102,241,0.10), transparent 40%),
-              radial-gradient(800px 400px at 90% 10%, rgba(34,211,238,0.08), transparent 40%),
-              linear-gradient(120deg, var(--bg-start) 0%, var(--bg-end) 100%);
-  color: var(--text);
+    font-family: 'Cairo', system-ui, Arial, sans-serif;
+    direction: rtl;
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    color: var(--text);
 }
 
 .container {
@@ -65,23 +63,23 @@ h2 {
 }
 
 .card {
-  background: linear-gradient(180deg, rgba(17,24,39,0.65) 0%, rgba(11,18,32,0.9) 100%);
-  border: 1px solid rgba(148,163,184,0.15);
-  border-radius: 16px;
-  box-shadow: 0 8px 40px rgba(2,6,23,0.45), inset 0 1px 0 rgba(255,255,255,0.03);
-  padding: 18px 14px 20px 14px;
+    background: var(--surface);
+    border: 1px solid #dbeafe; /* light blue border */
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(30,58,138,0.10);
+    padding: 18px 14px 20px 14px;
 }
 
 textarea, input[type="file"], input[type="text"] {
-  width: 100%;
-  margin-bottom: 14px;
-  background: var(--surface-2);
-  border: 1.5px solid rgba(148,163,184,0.22);
-  border-radius: 12px;
-  color: var(--text);
-  padding: 12px 14px;
-  font-size: 1.02rem;
-  transition: border 0.18s, box-shadow 0.18s, transform 0.06s;
+    width: 100%;
+    margin-bottom: 14px;
+    background: var(--surface-2);
+    border: 1.5px solid #cfe0ff;
+    border-radius: 12px;
+    color: var(--text);
+    padding: 12px 14px;
+    font-size: 1.02rem;
+    transition: border 0.18s, box-shadow 0.18s, background 0.18s;
 }
 
 textarea:focus, input[type="file"]:focus, input[type="text"]:focus {
@@ -93,82 +91,82 @@ textarea:focus, input[type="file"]:focus, input[type="text"]:focus {
 .excel-upload-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .excel-upload-input { display: none; }
 .excel-upload-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%);
-  color: #fff;
-  padding: 10px 16px;
-  border-radius: 14px;
-  font-size: 1.06rem;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 6px 28px rgba(99,102,241,0.25);
-  min-width: 230px;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 14px;
+    font-size: 1.06rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(59,130,246,0.35);
+    min-width: 230px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
-.excel-upload-label:hover { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(99,102,241,0.35); filter: saturate(1.15); }
+.excel-upload-label:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(29,78,216,0.35); }
 .excel-upload-label svg { width: 28px; height: 28px; fill: #fff; }
 
 button {
-  padding: 11px 22px;
-  margin: 6px 4px;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.18s ease, filter 0.18s ease;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%);
-  color: #fff;
-  border: 0;
-  border-radius: 12px;
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  box-shadow: 0 6px 24px rgba(99,102,241,0.25);
+    padding: 11px 22px;
+    margin: 6px 4px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.18s ease;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%);
+    color: #fff;
+    border: 0;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 18px rgba(59,130,246,0.35);
 }
-button:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 10px 34px rgba(99,102,241,0.35); filter: saturate(1.1); }
+button:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 26px rgba(29,78,216,0.35); }
 button:active { transform: translateY(0) scale(0.99); }
 
 .buttons-wrapper { text-align: center; margin: 10px 0 6px 0; }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 12px auto 0 auto;
-  background: linear-gradient(180deg, rgba(17,24,39,0.7) 0%, rgba(11,18,32,0.95) 100%);
-  border: 1px solid rgba(148,163,184,0.18);
-  box-shadow: 0 10px 40px rgba(2,6,23,0.5);
-  border-radius: 14px;
-  overflow: hidden;
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px auto 0 auto;
+    background: #ffffff;
+    border: 1px solid #dbeafe;
+    box-shadow: 0 2px 12px rgba(30,64,175,0.12);
+    border-radius: 14px;
+    overflow: hidden;
 }
 th, td {
-  border-top: 1px solid rgba(148,163,184,0.18);
-  border-left: 1px solid rgba(148,163,184,0.10);
-  padding: 12px 10px;
-  text-align: center;
-  font-size: 1rem;
+    border-top: 1px solid #e2e8f0;
+    border-left: 1px solid #f1f5f9;
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 0.95rem;
 }
 thead th {
-  background: linear-gradient(90deg, rgba(99,102,241,0.18) 0%, rgba(34,211,238,0.18) 100%);
-  color: var(--primary-2);
+    background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%);
+    color: #ffffff;
 }
-tbody td { color: var(--text); }
-.row-error td { background: rgba(239,68,68,0.10); color: #fecaca; }
+tbody td { color: #0f172a; }
+.row-error td { background: #fee2e2; color: #991b1b; }
 
 input[type="text"].zone-new {
-  padding: 9px;
-  border-radius: 10px;
-  background: var(--surface-2);
-  border: 1.5px solid rgba(148,163,184,0.22);
-  color: var(--text);
+    padding: 9px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1.5px solid #cfe0ff;
+    color: var(--text);
 }
 
-.separator { height: 2px; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%); opacity: 0.75; border-radius: 2px; margin: 22px 0; }
+.separator { height: 3px; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%); opacity: 0.85; border-radius: 2px; margin: 24px 0; }
 
 @media (max-width: 900px) {
-  .container { padding: 18px 10px 26px 10px; }
-  h2 { font-size: 1.35rem; }
-  button { padding: 10px 14px; font-size: 0.98rem; }
-  th, td { font-size: 0.95rem; padding: 9px 6px; }
+    .container { padding: 18px 10px 26px 10px; }
+    h2 { font-size: 1.35rem; }
+    button { padding: 10px 14px; font-size: 0.98rem; }
+    th, td { font-size: 0.9rem; padding: 9px 6px; }
 }
 </style>
 </head>
@@ -267,15 +265,15 @@ FBS11FAT7PORT5ah	FBS0011	FBS0011-7</textarea>
     box-sizing: border-box;
     margin: 0;
     display: block;
-    background: linear-gradient(120deg, rgba(17,24,39,0.6) 0%, rgba(11,18,32,0.95) 100%);
-    border: 2px solid rgba(99,102,241,0.55);
+    background: linear-gradient(135deg,#ffffff 0%,#f0f6ff 100%); /* Light theme background */
+    border: 2px solid #3b82f6; /* Blue border */
     border-radius: 14px;
-    color: var(--text);
+    color: #0f172a;
     padding: 16px 16px 16px 44px;
-    font-size: 1.13rem;
+    font-size: 1.08rem;
     font-family: 'Cairo', system-ui, Arial, sans-serif;
-    box-shadow: 0 8px 36px rgba(2,6,23,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
-    transition: border 0.2s, box-shadow 0.2s, transform 0.06s;
+    box-shadow: 0 4px 18px rgba(59,130,246,0.20), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: border 0.2s, box-shadow 0.2s, background 0.2s, transform 0.06s;
     outline: none;
 }
 #raw:focus {
@@ -543,17 +541,24 @@ function parseLinesOld(text, createdBy){
             buffer = [];
         }
     }
-    // أظهر تنبيه إذا كان هناك صفوف ناقصة
+    // كشف المكررات
+    const seen = new Set();
+    const dups = [];
+    rows.forEach(r => {
+        if(seen.has(r.contract)) dups.push(r.contract);
+        else seen.add(r.contract);
+    });
+    // أظهر تنبيه إذا كان هناك صفوف ناقصة أو زونات مختلفة أو مكررات
     if(missingUsers.length > 0) {
-        showErrorPopup(missingUsers);
-    } else if(errorUsers.length > 0) {
-        showErrorPopup(errorUsers);
+        showErrorPopup(missingUsers, dups);
+    } else if(errorUsers.length > 0 || dups.length > 0) {
+        showErrorPopup(errorUsers, dups);
     }
     return rows;
 }
 
 // نافذة منبثقة لعرض اليوزريات التي بها مشكلة
-function showErrorPopup(users) {
+function showErrorPopup(users, dups) {
     let popup = document.createElement('div');
     popup.style.position = 'fixed';
     popup.style.top = '0';
@@ -565,12 +570,71 @@ function showErrorPopup(users) {
     popup.style.display = 'flex';
     popup.style.alignItems = 'center';
     popup.style.justifyContent = 'center';
-    popup.innerHTML = `<div style="background:#1e293b;padding:32px 24px 24px 24px;border-radius:16px;box-shadow:0 4px 32px #38bdf855;max-width:90vw;width:400px;text-align:center;">
-        <h3 style='color:#f87171;margin-bottom:18px;font-size:1.2rem;'>لا يمكن نقل المستخدمين التالية أسماؤهم إلى زون مختلفة:</h3>
-        <div style='color:#fff;margin-bottom:18px;max-height:200px;overflow:auto;'>${users.map(u=>`<div>${u}</div>`).join('')}</div>
-        <button onclick='this.parentNode.parentNode.remove()' style='margin-top:8px;padding:7px 18px;border-radius:8px;background:#f87171;color:#fff;font-weight:700;border:none;cursor:pointer;'>إغلاق</button>
+    let html = `<div style="background:#1e293b;padding:32px 24px 24px 24px;border-radius:16px;box-shadow:0 4px 32px #38bdf855;max-width:90vw;width:400px;text-align:center;">`;
+    if(users && users.length > 0) {
+        html += `<h3 style='color:#f87171;margin-bottom:12px;font-size:1.1rem;'>لا يمكن نقل المستخدمين التالية أسماؤهم إلى زون مختلفة:</h3>`;
+        html += `<div style='color:#fff;margin-bottom:14px;max-height:120px;overflow:auto;'>${users.map(u=>`<div>${u}</div>`).join('')}</div>`;
+    }
+    if(dups && dups.length > 0) {
+        html += `<h3 style='color:#b45309;margin-bottom:10px;font-size:1.05rem;'>تم حذف السجلات المكررة (Contract)</h3>`;
+        html += `<div style='color:#fbbf24;margin-bottom:12px;max-height:90px;overflow:auto;text-align:right;direction:rtl;font-size:0.92rem;line-height:1.5;'>${dups.map(c=>`<div>• ${c}</div>`).join('')}</div>`;
+    }
+    html += `<button onclick='this.parentNode.parentNode.remove()' style='margin-top:8px;padding:7px 18px;border-radius:8px;background:#f87171;color:#fff;font-weight:700;border:none;cursor:pointer;'>إغلاق</button></div>`;
+    popup.innerHTML = html;
+    document.body.appendChild(popup);
+}
+
+// عرض نافذة للمكررات التي سيتم حذفها عند التصدير
+function showDuplicatesPopup(dups) {
+    if(!dups || dups.length === 0) return;
+    let popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    popup.style.top = '0';
+    popup.style.left = '0';
+    popup.style.width = '100vw';
+    popup.style.height = '100vh';
+    popup.style.background = 'rgba(0,0,0,0.35)';
+    popup.style.zIndex = '2600';
+    popup.style.display = 'flex';
+    popup.style.alignItems = 'center';
+    popup.style.justifyContent = 'center';
+    popup.innerHTML = `<div style="background:var(--surface);padding:26px 22px 20px 22px;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.30);max-width:90vw;width:440px;text-align:center;border:1px solid #dbeafe;">
+        <h3 style='color:var(--primary);margin-bottom:12px;font-size:1.05rem;'>تم حذف السجلات المكررة (Contract)</h3>
+        <div style='color:var(--text);margin-bottom:16px;max-height:240px;overflow:auto;text-align:right;direction:rtl;font-size:0.9rem;line-height:1.5;'>${dups.map(c=>`<div>• ${c}</div>`).join('')}</div>
+        <button onclick='this.parentNode.parentNode.remove()' style='padding:8px 18px;border-radius:10px;background:linear-gradient(90deg,var(--primary) 0%,var(--primary-2) 100%);color:#fff;font-weight:700;border:none;cursor:pointer;'>إغلاق</button>
     </div>`;
     document.body.appendChild(popup);
+}
+
+// استخراج صفوف فريدة حسب العقد وإرجاع المكررات المحذوفة
+function extractUniqueContracts(table, contractIdx, zoneIdx, fdtIdx, createdByIdx) {
+    const seen = new Set();
+    const duplicates = [];
+    const unique = [];
+    table.querySelectorAll('tbody tr').forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        const contract = (tds[contractIdx].textContent || '').trim();
+        if(seen.has(contract)) {
+            duplicates.push(contract);
+            return; // تجاهل المكرر
+        }
+        seen.add(contract);
+        const zone = zoneIdx !== null ? (tds[zoneIdx].textContent || '').trim() : '';
+        const fdtCell = fdtIdx !== null ? tds[fdtIdx] : null;
+        let fdt = '';
+        if(fdtCell){
+            const inEl = fdtCell.querySelector('input');
+            fdt = inEl ? inEl.value : fdtCell.textContent.trim();
+        }
+        const createdCell = createdByIdx !== null ? tds[createdByIdx] : null;
+        let createdBy = '';
+        if(createdCell){
+            const inEl2 = createdCell.querySelector('input');
+            createdBy = inEl2 ? inEl2.value : createdCell.textContent.trim();
+        }
+        unique.push([contract, zone, fdt, createdBy]);
+    });
+    return { unique, duplicates };
 }
 
 function buildTableOld(rows){
@@ -578,6 +642,13 @@ function buildTableOld(rows){
         document.getElementById('tblWrapOld').innerHTML = '<p>لا توجد بيانات.</p>';
         return;
     }
+    // كشف المكررات
+    const seen = new Set();
+    const dups = new Set();
+    rows.forEach(r => {
+        if(seen.has(r.contract)) dups.add(r.contract);
+        else seen.add(r.contract);
+    });
     let html = '<table id="mainTableOld"><thead><tr>' +
                '<th>Contract</th><th>Zone</th><th>FDT</th><th>Created by</th><th>Status</th>' +
            '</tr></thead><tbody>';
@@ -590,6 +661,8 @@ function buildTableOld(rows){
         } else if(r.error) {
             statusIcon = '❌';
             rowClass = ' class="row-error"';
+        } else if(dups.has(r.contract)) {
+            rowClass = ' class="row-duplicate"';
         }
         html += `<tr${rowClass}>
                       <td>${r.contract}</td>
@@ -602,6 +675,10 @@ function buildTableOld(rows){
     html += '</tbody></table>';
     document.getElementById('tblWrapOld').innerHTML = html;
 }
+
+// تمييز الصف المكرر (CSS)
+// أضف هذا في رأس الصفحة أو في style الرئيسي
+// .row-duplicate td { background: #fef08a !important; color: #b45309 !important; }
 
 
 // Popup logic
@@ -666,13 +743,10 @@ document.getElementById('changeCreatedByOld').addEventListener('click', function
 document.getElementById('exportExcelOld').addEventListener('click', function(){
     const table = document.getElementById('mainTableOld');
     if(!table){ alert('لا توجد بيانات للتحميل!'); return; }
-    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => {
-        const tds = tr.querySelectorAll('td');
-            // الأعمدة: 0 Contract, 1 Zone, 2 FDT, 3 Created by (input)
-            return [tds[0].textContent, tds[1].textContent, tds[2].textContent, tds[3].querySelector('input').value];
-    });
+    const { unique, duplicates } = extractUniqueContracts(table, 0, 1, 2, 3);
+    if(duplicates.length) { showDuplicatesPopup(duplicates); }
     const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...rows]);
+    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...unique]);
     XLSX.utils.book_append_sheet(wb, ws, "Table");
     XLSX.writeFile(wb, "OldData.xlsx");
 });
@@ -812,9 +886,17 @@ document.getElementById('togglePreviewNew').addEventListener('click', function()
 
 // بناء جدول Preview الجديد مع FDT من Zone الجديد
 function buildPreviewTableNew(){
+    // كشف المكررات
+    const seen = new Set();
+    const dups = new Set();
+    rawDataNew.forEach(r => {
+        if(seen.has(r.device)) dups.add(r.device);
+        else seen.add(r.device);
+    });
     const htmlRows = rawDataNew.map(r => {
         const fdtValue = cleanZeros(r.zone); // FDT يعتمد على Zone الجديد
-        return `<tr>
+        const rowClass = dups.has(r.device) ? ' class="row-duplicate"' : '';
+        return `<tr${rowClass}>
             <td>${r.device}</td>
             <td>${r.zone}</td>
             <td><input type="text" value="${fdtValue}"></td>
@@ -856,17 +938,10 @@ document.getElementById('changeCreatedByNew').addEventListener('click', ()=>{
 document.getElementById('exportExcelNew').addEventListener('click', ()=>{
     const table = document.getElementById('mainTableNew');
     if(!table){ alert('لا توجد بيانات لتصديرها!'); return; }
-    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr=>{
-        const tds = tr.querySelectorAll('td');
-        return [
-            tds[0].textContent,
-            tds[1].textContent,
-            tds[2].querySelector('input').value,
-            tds[3].querySelector('input').value
-        ];
-    });
+    const { unique, duplicates } = extractUniqueContracts(table, 0, 1, 2, 3);
+    if(duplicates.length) { showDuplicatesPopup(duplicates); }
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...rows]);
+    const ws = XLSX.utils.aoa_to_sheet([["Contract","Zone","FDT","Created by"], ...unique]);
     XLSX.utils.book_append_sheet(wb, ws, "Table");
     XLSX.writeFile(wb, "FinalData.xlsx");
 });
